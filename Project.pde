@@ -15,16 +15,10 @@ ArrayList<FPoly> grounds;
 ArrayList<FCircle> robot1;
 ArrayList<FCircle> robot2;
 ArrayList<FCircle> robot3;
-PImage background;
-PImage sky;
-PImage tower;
-PImage Robot1, Robot2, Robot3;
-PImage tree;
-PImage meteor;
-PImage spirit;
-PImage blackhole;
+PImage background, sky, tower, Robot1, Robot2, Robot3, tree, meteor, spirit, blackhole;
+PImage rockButton,treeButton,astButton,spiritButton,bholeButton;
 boolean crob1=false,crob2=false,crob3=false;
-int waitR1=1000,waitR2=1500,waitR3=2000;
+int waitR1=100,waitR2=1000,waitR3=2000;
 int rob1=0,maxrob1=250,countR1=0,rob2=0,maxrob2=150,countR2=0,rob3=0,maxrob3=100,countR3=0;
 boolean[] destR1,destR2,destR3;
 boolean groundTouch=false;
@@ -41,12 +35,17 @@ boolean tree1on=false,tree2on=false,tree3on=false,gotPosition=false;
 int score=0;
 int experience=0;
 int health=100;
-int sbCount=0,cometCount=0, BHCount=0;
+int rockCount, sbCount=0,cometCount=0, BHCount=0;
 boolean createSB=false,createComet=false,cometPressed=false,createBH=false,BHPressed=false;
 int cometX, cometY, waves=0, maxWaves=3, BHX, BHY;
+int rockLevel=1,treeLevel=0,astLevel=0,spiritLevel=0,bholeLevel=0;
+int nrockLevel=1,ntreeLevel=3,nastLevel=5,nspiritLevel=8,nbholeLevel=10;
+int nextExperiencePoint=200;
 FCircle sb;
 FCircle com1,com2,com3,com4,com5;
 FCircle BH;
+Button rockB,treeB,astB,spiritB,bholeB;
+boolean rpressed=false,tpressed=false,apressed=false,spressed=false,bpressed=false;
 
 void setup() {
   explosionX=new int[500];
@@ -74,7 +73,22 @@ void setup() {
   meteor=loadImage("Meteor.png");
   spirit=loadImage("SpiritBall.png");
   blackhole=loadImage("BlackHole.png");
-  explosion=loadImages("Explosion/explosion_",".png",20);
+  rockButton=loadImage("RockButton.png");
+  treeButton=loadImage("TreeButton.png");
+  astButton=loadImage("AstButton.png");
+  spiritButton=loadImage("SpiritButton.png");
+  bholeButton=loadImage("BHoleButton.png");
+  rockB=new Button(20,520,50,50);
+  rockB.setImage(rockButton);
+  treeB=new Button(100,520,50,50);
+  treeB.setImage(treeButton);
+  astB=new Button(180,520,50,50);
+  astB.setImage(astButton);
+  spiritB=new Button(260,520,50,50);
+  spiritB.setImage(spiritButton);
+  bholeB=new Button(340,520,50,50);
+  bholeB.setImage(bholeButton);
+  explosion=loadImages("Explosion/Explosion",".png",13);
   rockexplosion=loadImages("RockExplosion/RockExplosion",".png",6);
   exp=maxim.loadFile("explosion.wav");
   exp.setLooping(false);
@@ -168,6 +182,11 @@ void setup() {
 }
 
 void draw() {
+  if(score>nextExperiencePoint)
+  {
+    experience++;
+    nextExperiencePoint+=200;
+  }
   if((BHCount>1)&&(BHCount<150))
     tint(200,200,255);
   image(sky,width/2,height/2,width,height);
@@ -249,15 +268,20 @@ void draw() {
   }
   image(background,width/2,height/2,width,height);
   image(tower,width/2+100,height/2-53,width/5,height/2.5);
+  rockB.display();
+  treeB.display();
+  astB.display();
+  spiritB.display();
+  bholeB.display();
   if(expNo>0)
   {
     for(int i=0;i<expNo;i++)
     {
       if(expdisp[i]>0)
       {
-        if(expdisp[i]<=20)
+        if(expdisp[i]<=13)
         {
-          image(explosion[expdisp[i]-1],explosionX[i],explosionY[i],40,40);
+          image(explosion[expdisp[i]-1],explosionX[i],explosionY[i],60,60);
           expdisp[i]++;
         }
         else
@@ -285,15 +309,50 @@ void draw() {
     FPoly ground=grounds.get(i);
     ground.draw(this);
   }
-  
+  textSize(10);
+  fill(0,0,0);
+  text("Draw in Sky",17,590);
+  text("Drag Ground Up",88,590);
+  text("A + Click",183,590);
+  text("S + Drag",265,590);
+  text("D + Click",343,590);
+  text("Level "+rockLevel,27,605);
+  text("Level "+treeLevel,107,605);
+  text("Level "+astLevel,187,605);
+  text("Level "+spiritLevel,267,605);
+  text("Level "+bholeLevel,347,605);
+  if(rockLevel<3)
+    text(nrockLevel+" to Upgrade",14,620);
+  else
+    text("Final Level",19,620);
+  if(treeLevel==0)
+    text(ntreeLevel+" to Acquire",94,620);
+  else if(treeLevel<2)
+    text(ntreeLevel+" to Upgrade",94,620);
+  else
+    text("Final Level",99,620);
+  if(astLevel==0)
+    text(nastLevel+" to Acquire",174,620);
+  else if(astLevel<2)
+    text(nastLevel+" to Upgrade",174,620);
+  else
+    text("Final Level",179,620);
+  if(spiritLevel==0)
+    text(nspiritLevel+" to Acquire",254,620);
+  else
+    text("Final Level",259,620);
+  if(bholeLevel==0)
+    text(nbholeLevel+" to Acquire",334,620);
+  else
+    text("Final Level",339,620);
   if(createSB)
   {
     if(sbCount==1)
     {
-    sb=new FCircle(50);
+    sb=new FCircle(30);
     sb.setFill(0,0,0,0);
     sb.setPosition(500,300);
-    sb.setStroke(200,200,255);
+    sb.setNoStroke();
     sb.setDensity(12);
     sb.setStatic(true);
     world.add(sb);
@@ -301,7 +360,15 @@ void draw() {
     sbCount++;
     if(sbCount<=150)
     {
-      image(spirit,sb.getX()+1,sb.getY()+1,50,50);
+      pushMatrix();
+      translate(sb.getX(),sb.getY());
+      rotate((float)sbCount/10);
+      if(sbCount<=25)
+        image(spirit,0,0,2*sbCount,2*sbCount);
+      else
+        image(spirit,0,0,50,50);
+      popMatrix();
+      
     }
     if(sbCount>=150)
       world.remove(sb);
@@ -352,11 +419,11 @@ void draw() {
     }
     if(cometCount<73)
     {
-      image(meteor,com1.getX(),com1.getY(),50,50);
-      image(meteor,com2.getX(),com2.getY(),50,50);
-      image(meteor,com3.getX(),com3.getY(),50,50);
-      image(meteor,com4.getX(),com4.getY(),50,50);
-      image(meteor,com5.getX(),com5.getY(),50,50);
+      image(meteor,com1.getX(),com1.getY(),30,100);
+      image(meteor,com2.getX(),com2.getY(),30,100);
+      image(meteor,com3.getX(),com3.getY(),30,100);
+      image(meteor,com4.getX(),com4.getY(),30,100);
+      image(meteor,com5.getX(),com5.getY(),30,100);
     }
     cometCount++;
     if(cometCount>73)
@@ -379,6 +446,7 @@ void draw() {
   }
   if(createBH)
   {
+    BHPressed=false;
     if(BHCount==0)
     {
       BH=new FCircle(40);
@@ -404,7 +472,6 @@ void draw() {
     if(BHCount>150)
     {
       createBH=false;
-      BHPressed=false;
       BHCount=0;
     }
   }
@@ -570,6 +637,16 @@ void draw() {
 
 void mousePressed() {
   
+  if(rockB.mousePressed())
+    rpressed=true;
+  if(treeB.mousePressed())
+    tpressed=true;
+  if(astB.mousePressed())
+    apressed=true;
+  if(spiritB.mousePressed())
+    spressed=true;
+  if(bholeB.mousePressed())
+    bpressed=true;
   if (world.getBody(mouseX, mouseY) != null) {
     FBody b=world.getBody(mouseX,mouseY);
     if((b.getDensity()==0.1)&&(trees<maxtrees))
@@ -602,6 +679,7 @@ void mousePressed() {
 void mouseDragged() {
   cometPressed=false;
   BHPressed=false;
+  rpressed=tpressed=apressed=spressed=bpressed=false;
   if (poly!=null) {
     poly.vertex(mouseX, mouseY);
   FBody ch=world.getBody(mouseX,mouseY);
@@ -643,7 +721,43 @@ void mouseDragged() {
 }
 
 void mouseReleased() {
+  if((rpressed)&&(experience>=nrockLevel)&&(nrockLevel!=0))
+    {
+      
+        rockLevel++;
+        experience-=nrockLevel;
+        if(rockLevel==3)
+          nrockLevel=0;
+    }
+    if((tpressed)&&(experience>=ntreeLevel)&&(ntreeLevel!=0))
+    {
+        treeLevel++;
+        experience-=ntreeLevel;
+        if(treeLevel==2)
+          ntreeLevel=0;
+    }
+    if((apressed)&&(experience>=nastLevel)&&(nastLevel!=0))
+    {
+        astLevel++;
+        experience-=nastLevel;
+        if(nastLevel==2)
+          nastLevel=0;
+    }
+    if((spressed)&&(experience>=nspiritLevel)&&(nspiritLevel!=0))
+    {
+        spiritLevel++;
+        experience-=nspiritLevel;
+        nspiritLevel=0;
+    }
+    if((bpressed)&&(experience>=nbholeLevel)&&(nbholeLevel!=0))
+    {
+        bholeLevel++;
+        experience-=nbholeLevel;
+        nbholeLevel=0;
+    }
+    rpressed=tpressed=apressed=spressed=bpressed=false;
   if (poly!=null) {
+    
     float w=maxX-minX;
     float h=maxY-minY;
     maxX=maxY=0;
@@ -1023,19 +1137,19 @@ void contactEnded(FContact c) {
 }
 
 void keyPressed() {
-  if ((key == 's'||key == 's')&&(createSB==false)) 
+  if ((key == 's'||key == 's')&&(createSB==false)&&(spiritLevel>0)) 
   {
     createSB=true;
     cometPressed=false;
     BHPressed=false;
     sbCount=1;
   }
-  if ((key == 'a'||key == 'A')&&(createComet==false)) 
+  if ((key == 'a'||key == 'A')&&(createComet==false)&&(astLevel>0)) 
   {
     cometPressed=true;
     BHPressed=false;
   }
-  if ((key == 'd'||key == 'D')&&(createBH==false)) 
+  if ((key == 'd'||key == 'D')&&(createBH==false)&&(bholeLevel>0)) 
   {
     BHPressed=true;  
     cometPressed=false;
