@@ -9,6 +9,7 @@ int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
 int gbits;
 int count=0;
+int rockWait,treeWait,astWait=200,spiritWait,bholeWait;
 float psize=100;
 float maxX=0,maxY=0,minX=1000,minY=1000;
 ArrayList<FPoly> grounds;
@@ -28,7 +29,7 @@ FPoly tree1,tree2,tree3;
 int[] explosionX,explosionY;
 int expNo=0;
 int expdisp[];
-int trees=0, maxtrees=3;
+int trees=0, maxtrees=0;
 int tree1count=0,tree2count=0,tree3count=0;
 float tree1height,tree2height,tree3height,tree1x,tree2x,tree3x,tree1y,tree2y,tree3y;
 boolean tree1on=false,tree2on=false,tree3on=false,gotPosition=false;
@@ -37,9 +38,9 @@ int experience=0;
 int health=100;
 int rockCount, sbCount=0,cometCount=0, BHCount=0;
 boolean createSB=false,createComet=false,cometPressed=false,createBH=false,BHPressed=false;
-int cometX, cometY, waves=0, maxWaves=3, BHX, BHY;
+int cometX, cometY, waves=0, maxWaves=0, BHX, BHY;
 int rockLevel=1,treeLevel=0,astLevel=0,spiritLevel=0,bholeLevel=0;
-int nrockLevel=1,ntreeLevel=3,nastLevel=5,nspiritLevel=8,nbholeLevel=10;
+int nrockLevel=1,ntreeLevel=3,nastLevel=4,nspiritLevel=8,nbholeLevel=10;
 int nextExperiencePoint=200;
 FCircle sb;
 FCircle com1,com2,com3,com4,com5;
@@ -436,7 +437,7 @@ void draw() {
     }
     if((cometCount>74)&&(waves<maxWaves))
       cometCount=0;
-    if(cometCount>150)
+    if(cometCount>astWait)
     {
       createComet=false;
       cometPressed=false;
@@ -734,14 +735,27 @@ void mouseReleased() {
         treeLevel++;
         experience-=ntreeLevel;
         if(treeLevel==2)
+        {
           ntreeLevel=0;
+          maxtrees=3;
+        }
+        else
+          maxtrees=1;
     }
     if((apressed)&&(experience>=nastLevel)&&(nastLevel!=0))
     {
         astLevel++;
         experience-=nastLevel;
         if(nastLevel==2)
+        {
+          maxWaves=3;
           nastLevel=0;
+        }
+        else
+        {
+          nastLevel=2;
+          maxWaves=1;
+        }
     }
     if((spressed)&&(experience>=nspiritLevel)&&(nspiritLevel!=0))
     {
