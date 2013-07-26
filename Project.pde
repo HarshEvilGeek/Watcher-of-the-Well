@@ -9,9 +9,9 @@ int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
 int gbits;
 int count=0;
-int rockWait,treeWait,astWait=200,spiritWait,bholeWait;
+int rockWait=0,treeWait,astWait=200,spiritWait,bholeWait;
 float psize=100;
-float maxX=0,maxY=0,minX=1000,minY=1000;
+float maxX=0,maxY=0,minX=1000,minY=1000,maxYsX,minXsY;
 ArrayList<FPoly> grounds;
 ArrayList<FCircle> robot1;
 ArrayList<FCircle> robot2;
@@ -19,7 +19,7 @@ ArrayList<FCircle> robot3;
 PImage background, sky, tower, Robot1, Robot2, Robot3, tree, meteor, spirit, blackhole;
 PImage rockButton,treeButton,astButton,spiritButton,bholeButton;
 boolean crob1=false,crob2=false,crob3=false;
-int waitR1=100,waitR2=1000,waitR3=2000;
+int waitR1=100,waitR2=1000,waitR3=3000;
 int rob1=0,maxrob1=250,countR1=0,rob2=0,maxrob2=150,countR2=0,rob3=0,maxrob3=100,countR3=0;
 boolean[] destR1,destR2,destR3;
 boolean groundTouch=false;
@@ -36,7 +36,7 @@ boolean tree1on=false,tree2on=false,tree3on=false,gotPosition=false;
 int score=0;
 int experience=0;
 int health=100;
-int rockCount, sbCount=0,cometCount=0, BHCount=0;
+int rockCount=50, sbCount=0,cometCount=0, BHCount=0;
 boolean createSB=false,createComet=false,cometPressed=false,createBH=false,BHPressed=false;
 int cometX, cometY, waves=0, maxWaves=0, BHX, BHY;
 int rockLevel=1,treeLevel=0,astLevel=0,spiritLevel=0,bholeLevel=0;
@@ -46,6 +46,7 @@ FCircle sb;
 FCircle com1,com2,com3,com4,com5;
 FCircle BH;
 Button rockB,treeB,astB,spiritB,bholeB;
+FBox outline;
 boolean rpressed=false,tpressed=false,apressed=false,spressed=false,bpressed=false;
 
 void setup() {
@@ -188,6 +189,7 @@ void draw() {
     experience++;
     nextExperiencePoint+=200;
   }
+  rockCount++;
   if((BHCount>1)&&(BHCount<150))
     tint(200,200,255);
   image(sky,width/2,height/2,width,height);
@@ -660,6 +662,8 @@ void mousePressed() {
     return;
   if(BHPressed)
     return;
+  if(rockCount>rockWait)
+  {
   poly = new FPoly();
   poly.setStrokeWeight(2);
   poly.setGrabbable(false);
@@ -667,14 +671,23 @@ void mousePressed() {
   poly.setDensity(10);
   poly.setRestitution(0.5);
   poly.vertex(mouseX, mouseY);
+  fill(0,0,0,0);
+  rect(mouseX-psize/2,mouseY,psize,psize);
   if(mouseX>maxX)
     maxX=mouseX;
   if(mouseY>maxY)
+  {
     maxY=mouseY;
+    maxYsX=mouseX;
+  }
   if(mouseX<minX)
+  {
+    minXsY=mouseY;
     minX=mouseX;
+  }
   if(mouseY<minY)
     minY=mouseY;
+  }
 }
 
 void mouseDragged() {
@@ -684,17 +697,33 @@ void mouseDragged() {
   if (poly!=null) {
     poly.vertex(mouseX, mouseY);
   FBody ch=world.getBody(mouseX,mouseY);
+  
   if(ch!=null)
     groundTouch=true;
   if(mouseX>maxX)
     maxX=mouseX;
   if(mouseY>maxY)
+  {
+    maxYsX=mouseX;
     maxY=mouseY;
+  }
   if(mouseX<minX)
+  {
     minX=mouseX;
+    minXsY=mouseY;
+  }
   if(mouseY<minY)
     minY=mouseY;
+  fill(0,0,0,0);
+  rect(min(maxX-psize/2,minX),minY,psize,psize);
+  if(((maxX-minX)>psize)||((maxY-minY)>psize))
+  {
+    poly=null;
+    maxX=maxY=0;
+    minY=minX=1000;
   }
+  }
+  
   else if(drawTree)
   {
     FBody b=world.getBody(mouseX,mouseY);
@@ -727,8 +756,18 @@ void mouseReleased() {
       
         rockLevel++;
         experience-=nrockLevel;
+        if(rockLevel==2)
+        {
+          rockWait=50;
+          psize=150;
+          nrockLevel=3;
+        }
         if(rockLevel==3)
+        {
+          psize=200;
+          rockWait=0;
           nrockLevel=0;
+        }
     }
     if((tpressed)&&(experience>=ntreeLevel)&&(ntreeLevel!=0))
     {
@@ -777,7 +816,10 @@ void mouseReleased() {
     maxX=maxY=0;
     minX=minY=1000;
     if((w>5)&&(h>5)&&(w<psize)&&(h<psize)&&(!groundTouch))
+    {
+      rockCount=0;
       world.add(poly);
+    }
     groundTouch=false;
     poly = null;
   }
@@ -994,9 +1036,9 @@ void contactEnded(FContact c) {
         if(hittree.getDensity()==9)
           health-=5;
         else if(hittree.getDensity()==5)
-          health-=10;
+          health-=7;
         else if(hittree.getDensity()==2)
-          health-=15;
+          health-=10;
         expdisp[expNo]=1;
         expNo++;
         exp.cue(0);
@@ -1168,13 +1210,6 @@ void keyPressed() {
     BHPressed=true;  
     cometPressed=false;
   }
-  /*{
-    FBody hovered = world.getBody(mouseX, mouseY);
-    if ( hovered != null &&
-         hovered.isStatic() == false ) {
-      world.remove(hovered);
-    }
-  } */
 }
 
 
