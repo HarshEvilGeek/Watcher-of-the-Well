@@ -494,6 +494,15 @@ void draw() {
   if((countR3>waitR3)&(rob3<maxrob3))
     crob3=true;
     
+  if(poly!=null)
+  {
+    fill(0,0,0,0);
+      if(maxX-minX>psize/2)
+        rect(min(maxX-psize/2,minX),minY,psize,psize);
+      else
+        rect(minX-psize/2,minY,psize,psize);
+  }  
+  
   if(crob1)
   {  
     crob1=false;
@@ -662,6 +671,8 @@ void mousePressed() {
     return;
   if(BHPressed)
     return;
+  
+  
   if(rockCount>rockWait)
   {
   poly = new FPoly();
@@ -715,7 +726,10 @@ void mouseDragged() {
   if(mouseY<minY)
     minY=mouseY;
   fill(0,0,0,0);
-  rect(min(maxX-psize/2,minX),minY,psize,psize);
+  if(maxX-minX>psize/2)
+    rect(min(maxX-psize/2,minX),minY,psize,psize);
+  else
+    rect(minX-psize/2,minY,psize,psize);
   if(((maxX-minX)>psize)||((maxY-minY)>psize))
   {
     poly=null;
