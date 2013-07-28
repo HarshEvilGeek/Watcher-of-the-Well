@@ -505,7 +505,7 @@ void draw() {
     }
   }
   if(health<=0)
-    return;
+    intro=true;
   if (poly != null) {
     poly.draw(this);
   }
@@ -524,10 +524,16 @@ void draw() {
   if(poly!=null)
   {
     fill(0,0,0,0);
-      if(maxX-minX>psize/2)
-        rect(min(maxX-psize/2,minX),minY,psize,psize);
-      else
-        rect(minX-psize/2,minY,psize,psize);
+  if((maxX-minX<psize/2)&&(maxY-minY<psize/2))
+  {
+    rect(mouseX-psize/2,mouseY-psize/2,psize,psize);
+  }
+  else if(maxX-minX<psize/2)
+    rect(mouseX-psize/2,minY,psize,psize);
+  else if(maxY-minY<psize/2)
+    rect(minX,mouseY-psize/2,psize,psize);
+  else
+    rect(minX,minY,psize,psize);
   }  
   
   if(crob1&&!pause&&!intro)
@@ -717,7 +723,7 @@ void mousePressed() {
   poly.setRestitution(0.5);
   poly.vertex(mouseX, mouseY);
   fill(0,0,0,0);
-  rect(mouseX-psize/2,mouseY,psize,psize);
+  rect(mouseX-psize/2,mouseY-psize/2,psize,psize);
   if(mouseX>maxX)
     maxX=mouseX;
   if(mouseY>maxY)
@@ -767,11 +773,6 @@ void mouseDragged() {
   }
   if(mouseY<minY)
     minY=mouseY;
-  fill(0,0,0,0);
-  if(maxX-minX>psize/2)
-    rect(min(maxX-psize/2,minX),minY,psize,psize);
-  else
-    rect(minX-psize/2,minY,psize,psize);
   if(((maxX-minX)>psize)||((maxY-minY)>psize))
   {
     poly=null;
