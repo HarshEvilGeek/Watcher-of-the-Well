@@ -3,7 +3,7 @@ import fisica.*;
 FWorld world;
 FPoly poly;
 Maxim maxim;
-AudioPlayer exp,laser,treegrowth,r1,r2,r3;
+AudioPlayer exp,laser,treegrowth,r1sound,r2sound,r3sound,metsound,bhSound,spiritSound;
 PImage[] explosion,rockexplosion;
 int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 634, 785, 791, 820, 834, 865, 870};
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
@@ -18,7 +18,7 @@ ArrayList<FCircle> robot2;
 ArrayList<FCircle> robot3;
 PImage background, sky, tower, Robot1, Robot2, Robot3, tree, meteor, spirit, blackhole;
 PImage rockButton,treeButton,astButton,spiritButton,bholeButton;
-boolean crob1=false,crob2=false,crob3=false;
+boolean crob1=false,crob2=false,crob3=true;
 int waitR1=100,waitR2=1000,waitR3=3000;
 int rob1=0,maxrob1=250,countR1=0,rob2=0,maxrob2=150,countR2=0,rob3=0,maxrob3=100,countR3=0;
 boolean[] destR1,destR2,destR3;
@@ -34,7 +34,7 @@ int tree1count=0,tree2count=0,tree3count=0;
 float tree1height,tree2height,tree3height,tree1x,tree2x,tree3x,tree1y,tree2y,tree3y;
 boolean tree1on=false,tree2on=false,tree3on=false,gotPosition=false;
 int score=0;
-int experience=0;
+int experience=10;
 int health=100;
 int rockCount=50, sbCount=0,cometCount=0, BHCount=0;
 boolean createSB=false,createComet=false,cometPressed=false,createBH=false,BHPressed=false;
@@ -48,6 +48,7 @@ FCircle BH;
 Button rockB,treeB,astB,spiritB,bholeB;
 FBox outline;
 boolean rpressed=false,tpressed=false,apressed=false,spressed=false,bpressed=false;
+boolean pause=false, intro=false;
 
 void setup() {
   explosionX=new int[500];
@@ -67,7 +68,7 @@ void setup() {
     destR3[i]=false;
   background=loadImage("Background1.png");
   sky=loadImage("Sky.png");
-  tower=loadImage("tower.png");
+  tower=loadImage("Tower.png");
   Robot1=loadImage("Robot1.png");
   Robot2=loadImage("Robot2.png");
   Robot3=loadImage("Robot3.png");
@@ -94,13 +95,27 @@ void setup() {
   rockexplosion=loadImages("RockExplosion/RockExplosion",".png",6);
   exp=maxim.loadFile("explosion.wav");
   exp.setLooping(false);
-  exp.volume(1.5);
   laser=maxim.loadFile("DestroyRock.wav");
   laser.setLooping(false);
-  laser.volume(0.3);
+  laser.volume(0.8);
   treegrowth=maxim.loadFile("tree.wav");
   treegrowth.setLooping(false);
   treegrowth.speed(1.2);
+  metsound=maxim.loadFile("meteor.wav");
+  metsound.setLooping(false);
+  metsound.speed(1.2);
+  //r1sound=maxim.loadFile("r1sound.wav");
+  //r1sound.setLooping(false);
+  //r1sound.speed(0.8);
+  r2sound=maxim.loadFile("r2sound.wav");
+  r2sound.setLooping(false);
+  r2sound.volume(0.4);
+  r3sound=maxim.loadFile("r3sound.wav");
+  r3sound.setLooping(false);
+  r3sound.speed(0.8);
+  bhSound=maxim.loadFile("blackhole.wav");
+  bhSound.setLooping(false);
+  bhSound.volume(3);
   Fisica.init(this);
   gbits=gvx.length-1;
   grounds=new ArrayList<FPoly>();
@@ -184,19 +199,15 @@ void setup() {
 }
 
 void draw() {
-  if(score>nextExperiencePoint)
-  {
-    experience++;
-    nextExperiencePoint+=200;
-  }
-  rockCount++;
+  
   if((BHCount>1)&&(BHCount<150))
     tint(200,200,255);
   image(sky,width/2,height/2,width,height);
   tint(255,255,255);
   if(tree1on)
   {
-    tree1count++;
+    if(!pause)
+      tree1count++;
     float imght;
     if(tree1count<=20)
     {
@@ -221,7 +232,8 @@ void draw() {
   }
   if(tree2on)
   {
-    tree2count++;
+    if(!pause)
+      tree2count++;
     float imght;
     if(tree2count<=20)
     {
@@ -246,7 +258,8 @@ void draw() {
   }
   if(tree3on)
   {
-    tree3count++;
+    if(!pause)
+      tree3count++;
     float imght;
     if(tree3count<=20)
     {
@@ -276,6 +289,29 @@ void draw() {
   astB.display();
   spiritB.display();
   bholeB.display();
+  
+  fill(0,0,0);
+  textSize(20);
+  text("Score: " + score, 842, 50);
+  text("Experience: " + experience, 790, 85);
+  fill(0,0,0);
+  rect(width-445,110,102,8);
+  if(health>75)
+    fill(0,255,0);
+  else if(health>25)
+    fill(255,255,0);
+  else
+    fill(255,0,0);
+  rect(width-444,111,max(health,0),6);
+  if((!pause)&&(!intro))
+    world.step();
+  world.draw(this); 
+  if(score>nextExperiencePoint)
+  {
+    experience++;
+    nextExperiencePoint+=200;
+  }
+  rockCount++;
   if(expNo>0)
   {
     for(int i=0;i<expNo;i++)
@@ -292,21 +328,7 @@ void draw() {
       }
     }
   }
-  fill(0,0,0);
-  textSize(20);
-  text("Score: " + score, 842, 50);
-  text("Experience: " + experience, 790, 85);
-  fill(0,0,0);
-  rect(width-445,110,102,8);
-  if(health>75)
-    fill(0,255,0);
-  else if(health>25)
-    fill(255,255,0);
-  else
-    fill(255,0,0);
-  rect(width-444,111,max(health,0),6);
-  world.step();
-  world.draw(this); 
+  
   for(int i=0;i<gbits;i++)
   {
     FPoly ground=grounds.get(i);
@@ -418,6 +440,8 @@ void draw() {
     world.add(com3);
     world.add(com4);
     world.add(com5);
+    metsound.cue(0);
+    metsound.play();
     waves++;
     }
     if(cometCount<73)
@@ -460,6 +484,8 @@ void draw() {
       BH.setPosition(BHX,BHY);
       BH.setDensity(13);
       world.add(BH);
+      bhSound.cue(0);
+      bhSound.play();
     }
     if(BHCount<=150)
     {
@@ -483,7 +509,8 @@ void draw() {
   if (poly != null) {
     poly.draw(this);
   }
-  
+  if(!pause&&!intro)
+  {
   countR1++;
   if((countR1>waitR1)&(rob1<maxrob1))
     crob1=true;
@@ -493,7 +520,7 @@ void draw() {
   countR3++;
   if((countR3>waitR3)&(rob3<maxrob3))
     crob3=true;
-    
+  } 
   if(poly!=null)
   {
     fill(0,0,0,0);
@@ -503,7 +530,7 @@ void draw() {
         rect(minX-psize/2,minY,psize,psize);
   }  
   
-  if(crob1)
+  if(crob1&&!pause&&!intro)
   {  
     crob1=false;
     waitR1=(int)random(50,200);
@@ -549,7 +576,7 @@ void draw() {
        }
      }
   }
-  if(crob2)
+  if(crob2&&!pause&&!intro)
   {  
     crob2=false;
     waitR2=(int)random(100,300);
@@ -597,7 +624,7 @@ void draw() {
        
      }
   }
-  if(crob3)
+  if(crob3&&!pause&&!intro)
   {  
     crob3=false;
     waitR3=(int)random(100,600);
@@ -613,6 +640,8 @@ void draw() {
     robot3.add(r3);
     world.add(r3);
     rob3++;
+    r3sound.cue(0);
+    r3sound.play();
   }
   for(int i=0;i<rob3;i++)
   {
@@ -648,7 +677,12 @@ void draw() {
 
 
 void mousePressed() {
-  
+  if(pause)
+    return;
+  if(intro)
+  {
+    return;
+  }
   if(rockB.mousePressed())
     rpressed=true;
   if(treeB.mousePressed())
@@ -702,6 +736,14 @@ void mousePressed() {
 }
 
 void mouseDragged() {
+  if(pause)
+  {
+    return;
+  }
+  if(intro)
+  {
+    return;
+  }
   cometPressed=false;
   BHPressed=false;
   rpressed=tpressed=apressed=spressed=bpressed=false;
@@ -756,15 +798,40 @@ void mouseDragged() {
       gotPosition=true;
       }
     }
-    else if(b.getDensity()==0.1);
     else
     {
-      drawTree=false;
+      float x=b.getDensity();
+      if(x==2||x==0.1||x==8||x==5||x==10||x==13)
+      {
+        if(!gotPosition)
+        {
+        treex=mouseX;
+        treey=mouseY+5;
+        b=world.getBody(treex,treey);
+        while((b==null)||(b.getDensity()!=0.1))
+        {
+          treey++;
+          b=world.getBody(treex,treey);
+        }
+        gotPosition=true;
+      }
+      }
+      else
+        drawTree=false;
     }
+    
   }
 }
 
 void mouseReleased() {
+  if(pause)
+  {
+    return;
+  }
+  if(intro)
+  {
+    return;
+  }
   if((rpressed)&&(experience>=nrockLevel)&&(nrockLevel!=0))
     {
       
@@ -1060,6 +1127,12 @@ void contactEnded(FContact c) {
         }
         world.remove(hittree);
     }
+    FBody r2P=c.getBody2();
+    if(r2P.getDensity()==5)
+    {
+      r2sound.cue(0);
+      r2sound.play();
+    }
     return;
   }
   if (c.getBody2() == grounds.get(i))
@@ -1085,6 +1158,12 @@ void contactEnded(FContact c) {
         exp.play();
         }
         world.remove(hittree); 
+    }
+    FBody r2P=c.getBody1();
+    if(r2P.getDensity()==5)
+    {
+      r2sound.cue(0);
+      r2sound.play();
     }
     return;
   }
@@ -1223,6 +1302,10 @@ void keyPressed() {
   {
     BHPressed=true;  
     cometPressed=false;
+  }
+  if(key==' ')
+  {
+    pause=!pause;
   }
 }
 
