@@ -3,13 +3,15 @@ import fisica.*;
 FWorld world;
 FPoly poly;
 Maxim maxim;
-AudioPlayer exp,laser,treegrowth,r1sound,r2sound,r3sound,metsound,bhSound,spiritSound;
-PImage[] explosion,rockexplosion;
+AudioPlayer exp,laser,treegrowth,r1sound1,r1sound2,r1sound3,r2sound,r3sound,metsound,bhSound,spiritSound;
+PImage[] explosion,cooldown;
+PImage[] num;
+PImage title,play,playh,instr,instrh,credits,creditsh,creditsPage,instrPage;
 int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 634, 785, 791, 820, 834, 865, 870};
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
 int gbits;
 int count=0;
-int rockWait=0,treeWait,astWait=200,spiritWait,bholeWait;
+int rockWait=100,treeWait,astWait=200,spiritWait,bholeWait;
 float psize=100;
 float maxX=0,maxY=0,minX=1000,minY=1000,maxYsX,minXsY;
 ArrayList<FPoly> grounds;
@@ -17,10 +19,11 @@ ArrayList<FCircle> robot1;
 ArrayList<FCircle> robot2;
 ArrayList<FCircle> robot3;
 PImage background, sky, tower, Robot1, Robot2, Robot3, tree, meteor, spirit, blackhole;
-PImage rockButton,treeButton,astButton,spiritButton,bholeButton;
-boolean crob1=false,crob2=false,crob3=true;
+PImage rockButton,treeButton,astButton,spiritButton,bholeButton,rBox;
+boolean crob1=false,crob2=false,crob3=false;
 int waitR1=100,waitR2=1000,waitR3=3000;
 int rob1=0,maxrob1=250,countR1=0,rob2=0,maxrob2=150,countR2=0,rob3=0,maxrob3=100,countR3=0;
+int r1wait=100,r2wait=300,r3wait=400;
 boolean[] destR1,destR2,destR3;
 boolean groundTouch=false;
 boolean drawTree;
@@ -34,9 +37,9 @@ int tree1count=0,tree2count=0,tree3count=0;
 float tree1height,tree2height,tree3height,tree1x,tree2x,tree3x,tree1y,tree2y,tree3y;
 boolean tree1on=false,tree2on=false,tree3on=false,gotPosition=false;
 int score=0;
-int experience=10;
+int experience=0;
 int health=100;
-int rockCount=50, sbCount=0,cometCount=0, BHCount=0;
+int rockCount=100, sbCount=0,cometCount=0, BHCount=0;
 boolean createSB=false,createComet=false,cometPressed=false,createBH=false,BHPressed=false;
 int cometX, cometY, waves=0, maxWaves=0, BHX, BHY;
 int rockLevel=1,treeLevel=0,astLevel=0,spiritLevel=0,bholeLevel=0;
@@ -48,7 +51,7 @@ FCircle BH;
 Button rockB,treeB,astB,spiritB,bholeB;
 FBox outline;
 boolean rpressed=false,tpressed=false,apressed=false,spressed=false,bpressed=false;
-boolean pause=false, intro=false;
+boolean pause=false, intro=true;
 
 void setup() {
   explosionX=new int[500];
@@ -81,6 +84,16 @@ void setup() {
   astButton=loadImage("AstButton.png");
   spiritButton=loadImage("SpiritButton.png");
   bholeButton=loadImage("BHoleButton.png");
+  rBox=loadImage("box.png");
+  title=loadImage("Title.png");
+  play=loadImage("Play.png");
+  instr=loadImage("Instructions.png");
+  credits=loadImage("Credits.png");
+  playh=loadImage("PlayH.png");
+  instrh=loadImage("InstructionsH.png");
+  creditsh=loadImage("CreditsH.png");
+  //instrPage=loadImage("InstrPage.png");
+  creditsPage=loadImage("CreditsScreen.png");
   rockB=new Button(20,520,50,50);
   rockB.setImage(rockButton);
   treeB=new Button(100,520,50,50);
@@ -92,7 +105,7 @@ void setup() {
   bholeB=new Button(340,520,50,50);
   bholeB.setImage(bholeButton);
   explosion=loadImages("Explosion/Explosion",".png",13);
-  rockexplosion=loadImages("RockExplosion/RockExplosion",".png",6);
+  cooldown=loadImages("CoolDown/CoolDown",".png",7);
   exp=maxim.loadFile("explosion.wav");
   exp.setLooping(false);
   laser=maxim.loadFile("DestroyRock.wav");
@@ -104,13 +117,16 @@ void setup() {
   metsound=maxim.loadFile("meteor.wav");
   metsound.setLooping(false);
   metsound.speed(1.2);
-  //r1sound=maxim.loadFile("r1sound.wav");
-  //r1sound.setLooping(false);
-  //r1sound.speed(0.8);
-  r2sound=maxim.loadFile("r2sound.wav");
+  r1sound1=maxim.loadFile("R1sound1.wav");
+  r1sound1.setLooping(false);
+  r1sound2=maxim.loadFile("R1sound2.wav");
+  r1sound2.setLooping(false);
+  r1sound3=maxim.loadFile("R1sound3.wav");
+  r1sound3.setLooping(false);
+  r2sound=maxim.loadFile("R2sound.wav");
   r2sound.setLooping(false);
   r2sound.volume(0.4);
-  r3sound=maxim.loadFile("r3sound.wav");
+  r3sound=maxim.loadFile("R3sound.wav");
   r3sound.setLooping(false);
   r3sound.speed(0.8);
   bhSound=maxim.loadFile("blackhole.wav");
@@ -199,11 +215,14 @@ void setup() {
 }
 
 void draw() {
-  
+  background(255);
+  if(!intro)
+  {
   if((BHCount>1)&&(BHCount<150))
     tint(200,200,255);
   image(sky,width/2,height/2,width,height);
   tint(255,255,255);
+  
   if(tree1on)
   {
     if(!pause)
@@ -282,14 +301,20 @@ void draw() {
       trees--;
     }
   }
+  }
   image(background,width/2,height/2,width,height);
   image(tower,width/2+100,height/2-53,width/5,height/2.5);
+  if(!intro)
+  {
   rockB.display();
   treeB.display();
   astB.display();
   spiritB.display();
   bholeB.display();
+  }
   
+  if(!intro)
+  {
   fill(0,0,0);
   textSize(20);
   text("Score: " + score, 842, 50);
@@ -303,9 +328,11 @@ void draw() {
   else
     fill(255,0,0);
   rect(width-444,111,max(health,0),6);
+  }
   if((!pause)&&(!intro))
     world.step();
   world.draw(this); 
+ 
   if(score>nextExperiencePoint)
   {
     experience++;
@@ -334,6 +361,28 @@ void draw() {
     FPoly ground=grounds.get(i);
     ground.draw(this);
   }
+  
+  if(intro)
+  {
+    int playPosX=80,instPosX=270,creditsPosX=480;
+    int playPosY=282,instPosY=280,creditsPosY=280;
+    float scale=2.8;
+    image(title,240,180,756.0/2.3,234.0/2.3);
+    if((mouseX>playPosX-30)&&(mouseX<playPosX+30)&&(mouseY>playPosY-10)&&(mouseY<playPosY+10))
+      image(playh,playPosX,playPosY,165/scale,69/scale);
+    else
+      image(play,playPosX,playPosY,165/scale,69/scale);
+    if((mouseX>instPosX-50)&&(mouseX<instPosX+50)&&(mouseY>instPosY-10)&&(mouseY<instPosY+10))
+      image(instrh,instPosX,instPosY,413/scale,56/scale);
+    else
+      image(instr,instPosX,instPosY,413/scale,56/scale);
+    if((mouseX>creditsPosX-33)&&(mouseX<creditsPosX+38)&&(mouseY>creditsPosY-10)&&(mouseY<creditsPosY+10))
+      image(creditsh,creditsPosX,creditsPosY,242/scale,56/scale);
+    else
+      image(credits,creditsPosX,creditsPosY,242/scale,56/scale);
+  }
+  if(!intro)
+  {
   textSize(10);
   fill(0,0,0);
   text("Draw in Sky",17,590);
@@ -370,6 +419,7 @@ void draw() {
     text(nbholeLevel+" to Acquire",334,620);
   else
     text("Final Level",339,620);
+  }
   if(createSB)
   {
     if(sbCount==1)
@@ -526,20 +576,20 @@ void draw() {
     fill(0,0,0,0);
   if((maxX-minX<psize/2)&&(maxY-minY<psize/2))
   {
-    rect(mouseX-psize/2,mouseY-psize/2,psize,psize);
+    image(rBox,mouseX,mouseY,psize,psize);
   }
   else if(maxX-minX<psize/2)
-    rect(mouseX-psize/2,minY,psize,psize);
+    image(rBox,mouseX,minY+psize/2,psize,psize);
   else if(maxY-minY<psize/2)
-    rect(minX,mouseY-psize/2,psize,psize);
+    image(rBox,minX+psize/2,mouseY,psize,psize);
   else
-    rect(minX,minY,psize,psize);
+    image(rBox,minX+psize/2,minY+psize/2,psize,psize);
   }  
   
   if(crob1&&!pause&&!intro)
   {  
     crob1=false;
-    waitR1=(int)random(50,200);
+    waitR1=(int)random(r1wait,r1wait+150);
     countR1=0;
     FCircle r1=new FCircle(40);
     r1.setPosition(-20,359);
@@ -558,6 +608,12 @@ void draw() {
     FCircle r1=robot1.get(i);
      if((r1!=null)&&(!destR1[i]))
      {
+       if(i%3==0)
+         r1sound1.play();
+       else if(i%3==1)
+         r1sound2.play();
+       else
+         r1sound3.play();
        float r1x=r1.getX();
        float r1y=r1.getY();
        float r1angle=r1.getRotation();
@@ -585,7 +641,7 @@ void draw() {
   if(crob2&&!pause&&!intro)
   {  
     crob2=false;
-    waitR2=(int)random(100,300);
+    waitR2=(int)random(r2wait,r2wait+200);
     countR2=0;
     FCircle r2=new FCircle(40);
     r2.setPosition(-20,300);
@@ -633,7 +689,7 @@ void draw() {
   if(crob3&&!pause&&!intro)
   {  
     crob3=false;
-    waitR3=(int)random(100,600);
+    waitR3=(int)random(r3wait,r3wait+400);
     countR3=0;
     FCircle r3=new FCircle(30);
     r3.setPosition(-20,250);
@@ -684,9 +740,12 @@ void draw() {
 
 void mousePressed() {
   if(pause)
-    return;
+  {
+    
+  }
   if(intro)
   {
+    
     return;
   }
   if(rockB.mousePressed())
@@ -723,7 +782,7 @@ void mousePressed() {
   poly.setRestitution(0.5);
   poly.vertex(mouseX, mouseY);
   fill(0,0,0,0);
-  rect(mouseX-psize/2,mouseY-psize/2,psize,psize);
+  image(rBox,mouseX,mouseY,psize,psize);
   if(mouseX>maxX)
     maxX=mouseX;
   if(mouseY>maxY)
@@ -802,7 +861,7 @@ void mouseDragged() {
     else
     {
       float x=b.getDensity();
-      if(x==2||x==0.1||x==8||x==5||x==10||x==13)
+      if(x==2||x==0.1||x==8||x==5||x==10||x==13||x==9)
       {
         if(!gotPosition)
         {
@@ -847,7 +906,7 @@ void mouseReleased() {
         if(rockLevel==3)
         {
           psize=200;
-          rockWait=0;
+          rockWait=25;
           nrockLevel=0;
         }
     }
@@ -994,7 +1053,7 @@ void mouseReleased() {
 void contactStarted(FContact c) {
   FBody b1=c.getBody1();
   FBody b2=c.getBody2();
-  if((b1.getDensity()==12)&&((b2.getDensity()==9)||(b2.getDensity()==5)||(b2.getDensity()==2)||(b2.getDensity()==0)||(b2.getDensity()==0.1)))
+  if((b1.getDensity()==12)&&((b2.getDensity()==9)||(b2.getDensity()==5)||(b2.getDensity()==2)||(b2.getDensity()==0)||(b2.getDensity()==0.1)||(b2.getDensity()==10)))
   {
     if((!(b1.isStatic()))&&(b2.getDensity()<2))
     {
@@ -1058,7 +1117,7 @@ void contactStarted(FContact c) {
   }
   b1=c.getBody2();
   b2=c.getBody1();
-  if((b1.getDensity()==12)&&((b2.getDensity()==9)||(b2.getDensity()==5)||(b2.getDensity()==2)||(b2.getDensity()==0)||(b2.getDensity()==0.1)))
+  if((b1.getDensity()==12)&&((b2.getDensity()==9)||(b2.getDensity()==5)||(b2.getDensity()==2)||(b2.getDensity()==0)||(b2.getDensity()==0.1)||(b2.getDensity()==10)))
   {
     if((!(b1.isStatic()))&&(b2.getDensity()<2))
     {
