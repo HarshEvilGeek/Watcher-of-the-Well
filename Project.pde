@@ -6,7 +6,7 @@ Maxim maxim;
 AudioPlayer exp,laser,treegrowth,r1sound1,r1sound2,r1sound3,r2sound,r3sound,metsound,bhSound,spiritSound;
 PImage[] explosion,cooldown;
 PImage[] num;
-PImage title,play,playh,instr,instrh,credits,creditsh,creditsPage,instrPage;
+PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh,creditsPage,instrPage;
 int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 634, 785, 791, 820, 834, 865, 870};
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
 int gbits;
@@ -53,6 +53,7 @@ FBox outline;
 boolean rpressed=false,tpressed=false,apressed=false,spressed=false,bpressed=false;
 boolean pause=false, intro=true;
 
+
 void setup() {
   explosionX=new int[500];
   explosionY=new int[500];
@@ -94,6 +95,7 @@ void setup() {
   creditsh=loadImage("CreditsH.png");
   //instrPage=loadImage("InstrPage.png");
   creditsPage=loadImage("CreditsScreen.png");
+  titlescreen=loadImage("TitleScreen.png");
   rockB=new Button(20,520,50,50);
   rockB.setImage(rockButton);
   treeB=new Button(100,520,50,50);
@@ -215,7 +217,6 @@ void setup() {
 }
 
 void draw() {
-  background(255);
   if(!intro)
   {
   if((BHCount>1)&&(BHCount<150))
@@ -364,10 +365,12 @@ void draw() {
   
   if(intro)
   {
-    int playPosX=80,instPosX=270,creditsPosX=480;
-    int playPosY=282,instPosY=280,creditsPosY=280;
     float scale=2.8;
+    image(titlescreen,width/2,height/2,width,height);
     image(title,240,180,756.0/2.3,234.0/2.3);
+    int playPosX=80,instPosX=270,creditsPosX=480;    
+    int playPosY=282,instPosY=280,creditsPosY=280;
+
     if((mouseX>playPosX-30)&&(mouseX<playPosX+30)&&(mouseY>playPosY-10)&&(mouseY<playPosY+10))
       image(playh,playPosX,playPosY,165/scale,69/scale);
     else
