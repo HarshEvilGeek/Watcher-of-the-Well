@@ -20,6 +20,7 @@ ArrayList<FCircle> robot2;
 ArrayList<FCircle> robot3;
 PImage background, sky, tower, Robot1, Robot2, Robot3, tree, meteor, spirit, blackhole;
 PImage rockButton,treeButton,astButton,spiritButton,bholeButton,rBox;
+PImage pcredits,pcreditsh,pinstructions,pinstructionsh,pnewgame,pnewgameh,presumegame,presumegameh,ptitle,pwash;
 boolean crob1=false,crob2=false,crob3=false;
 int waitR1=100,waitR2=1000,waitR3=3000;
 int rob1=0,maxrob1=250,countR1=0,rob2=0,maxrob2=150,countR2=0,rob3=0,maxrob3=100,countR3=0;
@@ -52,6 +53,7 @@ Button rockB,treeB,astB,spiritB,bholeB;
 FBox outline;
 boolean rpressed=false,tpressed=false,apressed=false,spressed=false,bpressed=false;
 boolean pause=false, intro=true;
+boolean playHov=false,instrHov=false,creditsHov=false,playP=false,instrP=false,creditsP=false,instrDo=false,creditsDo=false;
 
 
 void setup() {
@@ -96,6 +98,16 @@ void setup() {
   //instrPage=loadImage("InstrPage.png");
   creditsPage=loadImage("CreditsScreen.png");
   titlescreen=loadImage("TitleScreen.png");
+  pcredits=loadImage("PCredits.PNG");
+  pcreditsh=loadImage("PCreditsH.PNG");
+  pinstructions=loadImage("PInstructions.PNG");
+  pinstructionsh=loadImage("PInstructionsH.PNG");
+  pnewgame=loadImage("PNewGame.PNG");
+  pnewgameh=loadImage("PNewGameH.PNG");
+  presumegame=loadImage("PResumeGame.PNG");
+  presumegameh=loadImage("PResumeGameH.PNG");
+  ptitle=loadImage("PTitle.PNG");
+  pwash=loadImage("PWash.png"); 
   rockB=new Button(20,520,50,50);
   rockB.setImage(rockButton);
   treeB=new Button(100,520,50,50);
@@ -121,10 +133,13 @@ void setup() {
   metsound.speed(1.2);
   r1sound1=maxim.loadFile("R1sound1.wav");
   r1sound1.setLooping(false);
+  r1sound1.volume(0.1);
   r1sound2=maxim.loadFile("R1sound2.wav");
   r1sound2.setLooping(false);
+  r1sound2.volume(0.1);
   r1sound3=maxim.loadFile("R1sound3.wav");
   r1sound3.setLooping(false);
+  r1sound3.volume(0.1);
   r2sound=maxim.loadFile("R2sound.wav");
   r2sound.setLooping(false);
   r2sound.volume(0.4);
@@ -340,6 +355,7 @@ void draw() {
     nextExperiencePoint+=200;
   }
   rockCount++;
+  
   if(expNo>0)
   {
     for(int i=0;i<expNo;i++)
@@ -365,25 +381,68 @@ void draw() {
   
   if(intro)
   {
-    float scale=2.8;
     image(titlescreen,width/2,height/2,width,height);
+    int playPosX=100,instPosX=290,creditsPosX=500;
+    int playPosY=324,instPosY=320,creditsPosY=320;
+    float scale=2;
     image(title,240,180,756.0/2.3,234.0/2.3);
-    int playPosX=80,instPosX=270,creditsPosX=480;    
-    int playPosY=282,instPosY=280,creditsPosY=280;
-
-    if((mouseX>playPosX-30)&&(mouseX<playPosX+30)&&(mouseY>playPosY-10)&&(mouseY<playPosY+10))
+    if((mouseX>playPosX-44)&&(mouseX<playPosX+44)&&(mouseY>playPosY-15)&&(mouseY<playPosY+15))
+    {
       image(playh,playPosX,playPosY,165/scale,69/scale);
+      playHov=true;
+    }
     else
+    {
       image(play,playPosX,playPosY,165/scale,69/scale);
-    if((mouseX>instPosX-50)&&(mouseX<instPosX+50)&&(mouseY>instPosY-10)&&(mouseY<instPosY+10))
+      playHov=false;
+    }
+    if((mouseX>instPosX-100)&&(mouseX<instPosX+100)&&(mouseY>instPosY-15)&&(mouseY<instPosY+15))
+    {
       image(instrh,instPosX,instPosY,413/scale,56/scale);
+      instrHov=true;
+    }
     else
+    {
       image(instr,instPosX,instPosY,413/scale,56/scale);
-    if((mouseX>creditsPosX-33)&&(mouseX<creditsPosX+38)&&(mouseY>creditsPosY-10)&&(mouseY<creditsPosY+10))
+      instrHov=false;
+    }
+    if((mouseX>creditsPosX-60)&&(mouseX<creditsPosX+60)&&(mouseY>creditsPosY-15)&&(mouseY<creditsPosY+15))
+    {
       image(creditsh,creditsPosX,creditsPosY,242/scale,56/scale);
+      creditsHov=true;
+    }
     else
+    {
       image(credits,creditsPosX,creditsPosY,242/scale,56/scale);
+      creditsHov=false;
+    }
   }
+  
+  if(pause)
+  {
+    image(pwash,width/2,height/2,width,height);
+    int pcreditsPosX=width/2,pinstPosX=width/2,pnewPosX=width/2,presPosX=width/2;
+    int pcreditsPosY=280, pinstPosY=310, pnewPosY=340, presPosY=250;
+    float scale=2;
+    image(ptitle,width/2,height/5);
+    if((mouseX>presPosX-88)&&(mouseX<presPosX+88)&&(mouseY>presPosY-10)&&(mouseY<presPosY+10))
+      image(presumegameh,presPosX,presPosY);
+    else
+      image(presumegame,presPosX,presPosY);
+    if((mouseX>pinstPosX-73)&&(mouseX<pinstPosX+73)&&(mouseY>pinstPosY-10)&&(mouseY<pinstPosY+10))
+      image(pinstructionsh,pinstPosX,pinstPosY);
+    else
+      image(pinstructions,pinstPosX,pinstPosY);
+    if((mouseX>pcreditsPosX-43)&&(mouseX<pcreditsPosX+43)&&(mouseY>pcreditsPosY-10)&&(mouseY<pcreditsPosY+10))
+      image(pcreditsh,pcreditsPosX,pcreditsPosY);
+    else
+      image(pcredits,pcreditsPosX,pcreditsPosY);
+    if((mouseX>pnewPosX-67)&&(mouseX<pnewPosX+67)&&(mouseY>pnewPosY-10)&&(mouseY<pnewPosY+10))
+      image(pnewgameh,pnewPosX,pnewPosY);
+    else
+      image(pnewgame,pnewPosX,pnewPosY);  
+  }
+  
   if(!intro)
   {
   textSize(10);
@@ -422,7 +481,7 @@ void draw() {
     text(nbholeLevel+" to Acquire",334,620);
   else
     text("Final Level",339,620);
-  }
+  
   if(createSB)
   {
     if(sbCount==1)
@@ -611,15 +670,18 @@ void draw() {
     FCircle r1=robot1.get(i);
      if((r1!=null)&&(!destR1[i]))
      {
+       float r1x=r1.getX();
+       float r1y=r1.getY();
+       float r1angle=r1.getRotation();
+       if((!pause)&&(r1x>10))
+       {
        if(i%3==0)
          r1sound1.play();
        else if(i%3==1)
          r1sound2.play();
        else
          r1sound3.play();
-       float r1x=r1.getX();
-       float r1y=r1.getY();
-       float r1angle=r1.getRotation();
+       }
        r1.setAngularVelocity(12);
        pushMatrix();
        translate(r1x,r1y);
@@ -738,6 +800,7 @@ void draw() {
        
      }
   }
+  }
 }
 
 
@@ -748,7 +811,12 @@ void mousePressed() {
   }
   if(intro)
   {
-    
+    if(playHov)
+      playP=true;
+    if(instrHov)
+      instrP=true;
+    if(creditsHov)
+      creditsP=true;
     return;
   }
   if(rockB.mousePressed())
@@ -893,6 +961,23 @@ void mouseReleased() {
   }
   if(intro)
   {
+    if(playHov&&playP)
+    {
+      intro=false;
+      health=100;
+      experience=0;
+      playP=false;
+    }
+    if(instrHov&&instrP)
+    {
+      instrDo=true;
+      instrP=false;
+    }
+    if(creditsHov&&creditsP)
+    {
+      creditsDo=true;
+      creditsP=false;
+    }
     return;
   }
   if((rpressed)&&(experience>=nrockLevel)&&(nrockLevel!=0))
@@ -1076,6 +1161,12 @@ void contactStarted(FContact c) {
              {
                score+=30;
                destR1[i]=true;
+               if(i%3==0)
+                 r1sound1.stop();
+               else if(i%3==1)
+                 r1sound2.stop();
+               else
+                 r1sound3.stop();
              }
              if(i<rob2)
              {
@@ -1139,6 +1230,12 @@ void contactStarted(FContact c) {
              {
                score+=30;
                destR1[i]=true;
+               if(i%3==0)
+                 r1sound1.stop();
+               else if(i%3==1)
+                 r1sound2.stop();
+               else
+                 r1sound3.stop();
              }
              if(i<rob2)
              {
@@ -1258,6 +1355,12 @@ void contactEnded(FContact c) {
              {
                score+=30;
                destR1[i]=true;
+               if(i%3==0)
+                 r1sound1.stop();
+               else if(i%3==1)
+                 r1sound2.stop();
+               else
+                 r1sound3.stop();
              }
              if(i<rob2)
              {
@@ -1312,6 +1415,12 @@ void contactEnded(FContact c) {
              {
                score+=30;
                destR1[i]=true;
+               if(i%3==0)
+                 r1sound1.stop();
+               else if(i%3==1)
+                 r1sound2.stop();
+               else
+                 r1sound3.stop();
              }
              if(i<rob2)
              {
