@@ -6,7 +6,7 @@ Maxim maxim;
 AudioPlayer exp,laser,treegrowth,r1sound1,r1sound2,r1sound3,r2sound,r3sound,metsound,bhSound,spiritSound;
 PImage[] explosion,cooldown;
 PImage[] num;
-PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh,creditsPage,instrPage;
+PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh;
 int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 634, 785, 791, 820, 834, 865, 870};
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
 int gbits;
@@ -54,7 +54,8 @@ FBox outline;
 boolean rpressed=false,tpressed=false,apressed=false,spressed=false,bpressed=false;
 boolean pause=false, intro=true;
 boolean playHov=false,instrHov=false,creditsHov=false,playP=false,instrP=false,creditsP=false,instrDo=false,creditsDo=false;
-
+boolean GoBackMenuHov=false,GoBackMenuP=false,instrNextHov=false,instrNextP=false,instrBackHov=false,instrBackP=false;
+int instPage=1;
 
 void setup() {
   explosionX=new int[500];
@@ -95,8 +96,6 @@ void setup() {
   playh=loadImage("PlayH.png");
   instrh=loadImage("InstructionsH.png");
   creditsh=loadImage("CreditsH.png");
-  //instrPage=loadImage("InstrPage.png");
-  creditsPage=loadImage("CreditsScreen.png");
   titlescreen=loadImage("TitleScreen.png");
   pcredits=loadImage("PCredits.PNG");
   pcreditsh=loadImage("PCreditsH.PNG");
@@ -817,6 +816,12 @@ void mousePressed() {
       instrP=true;
     if(creditsHov)
       creditsP=true;
+    if(GoBackMenuHov)
+      GoBackMenuP=true;
+    if(instrNextHov)
+      instrNextP=true;
+    if(instrBackHov)
+      instrBackP=true;
     return;
   }
   if(rockB.mousePressed())
@@ -977,6 +982,21 @@ void mouseReleased() {
     {
       creditsDo=true;
       creditsP=false;
+    }
+    if(GoBackMenuP&&GoBackMenuHov)
+    {
+      creditsDo=false;
+      instrDo=false;
+    }
+    if(instrNextP&&instrNextHov)
+    {
+      if(instPage<4)
+        instPage++;
+    }
+    if(instrBackP&&instrBackHov)
+    {
+      if(instPage>1)
+        instPage--;
     }
     return;
   }
