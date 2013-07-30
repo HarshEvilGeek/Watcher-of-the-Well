@@ -881,6 +881,10 @@ void mousePressed() {
       pauseResumeP=true;
     if(pauseNGHov)
       pauseNGP=true;
+    if(instrNextHov)
+      instrNextP=true;
+    if(instrBackHov)
+      instrBackP=true;
     return;
   }
   if(intro)
@@ -1095,6 +1099,16 @@ void mouseReleased() {
     {
       pauseInstrDo=true;
       pauseInstrP=false;
+    }
+    if(instrNextP&&instrNextHov)
+    {
+      if(instPage<4)
+        instPage++;
+    }
+    if(instrBackP&&instrBackHov)
+    {
+      if(instPage>1)
+        instPage--;
     }
     return;
   }
