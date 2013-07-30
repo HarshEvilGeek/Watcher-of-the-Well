@@ -5,13 +5,14 @@ FPoly poly;
 Maxim maxim;
 AudioPlayer exp,laser,treegrowth,r1sound1,r1sound2,r1sound3,r2sound,r3sound,metsound,bhSound,spiritSound;
 PImage[] explosion,cooldown;
+int CDN=7;
 PImage[] num;
 PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh;
 int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 634, 785, 791, 820, 834, 865, 870};
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
 int gbits;
 int count=0;
-int rockWait=100,treeWait,astWait=200,spiritWait,bholeWait;
+int rockWait=100,treeWait=200,astWait=250,spiritWait=750,bholeWait=750;
 float psize=100;
 float maxX=0,maxY=0,minX=1000,minY=1000,maxYsX,minXsY;
 ArrayList<FPoly> grounds;
@@ -45,7 +46,7 @@ boolean createSB=false,createComet=false,cometPressed=false,createBH=false,BHPre
 int cometX, cometY, waves=0, maxWaves=0, BHX, BHY;
 int rockLevel=1,treeLevel=0,astLevel=0,spiritLevel=0,bholeLevel=0;
 int nrockLevel=1,ntreeLevel=3,nastLevel=4,nspiritLevel=8,nbholeLevel=10;
-int nextExperiencePoint=200;
+int nextExperiencePoint=100;
 FCircle sb;
 FCircle com1,com2,com3,com4,com5;
 FCircle BH;
@@ -56,6 +57,10 @@ boolean pause=false, intro=true;
 boolean playHov=false,instrHov=false,creditsHov=false,playP=false,instrP=false,creditsP=false,instrDo=false,creditsDo=false;
 boolean GoBackMenuHov=false,GoBackMenuP=false,instrNextHov=false,instrNextP=false,instrBackHov=false,instrBackP=false;
 int instPage=1;
+boolean pauseResumeHov=false,pauseResumeP=false,pauseNGHov=false,pauseNGP=false,pauseInstrHov=false,pauseInstrP=false,pauseInstrDo=false;
+
+int recent;
+boolean lev2tree=false;
 
 void setup() {
   explosionX=new int[500];
@@ -118,7 +123,7 @@ void setup() {
   bholeB=new Button(340,520,50,50);
   bholeB.setImage(bholeButton);
   explosion=loadImages("Explosion/Explosion",".png",13);
-  cooldown=loadImages("CoolDown/CoolDown",".png",7);
+  cooldown=loadImages("CoolDown/CoolDown",".png",CDN);
   exp=maxim.loadFile("explosion.wav");
   exp.setLooping(false);
   laser=maxim.loadFile("DestroyRock.wav");
@@ -258,9 +263,12 @@ void draw() {
     image(tree,tree1x,tree1y-imght/2+10,imght*5/15+5,imght+15);
     if(tree1count>=150)
     {
+      world.remove(tree1);
+    }
+    if(tree1count>=treeWait)
+    {
       tree1count=0;
       tree1on=false;
-      world.remove(tree1);
       trees--;
     }
   }
@@ -284,9 +292,12 @@ void draw() {
     image(tree,tree2x,tree2y-imght/2+10,imght*5/15+5,imght+15);
     if(tree2count>=150)
     {
+      world.remove(tree2);
+    }
+    if(tree2count>=treeWait)
+    {
       tree2count=0;
       tree2on=false;
-      world.remove(tree2);
       trees--;
     }
   }
@@ -310,9 +321,12 @@ void draw() {
     image(tree,tree3x,tree3y-imght/2+10,imght*5/15+5,imght+15);
     if(tree3count>=150)
     {
+      world.remove(tree3);
+    }
+    if(tree3count>=treeWait)
+    {
       tree3count=0;
       tree3on=false;
-      world.remove(tree3);
       trees--;
     }
   }
@@ -326,8 +340,51 @@ void draw() {
   astB.display();
   spiritB.display();
   bholeB.display();
+  if(treeLevel==0)
+    image(cooldown[0],125,545,50,50);
+  if(astLevel==0)
+    image(cooldown[0],205,545,50,50);
+  if(spiritLevel==0)
+    image(cooldown[0],285,545,50,50);
+  if(bholeLevel==0)
+    image(cooldown[0],365,545,50,50);
+  if(!pause)
+  {
+    if(rockCount<rockWait)
+    {
+      image(cooldown[rockCount*CDN/rockWait],45,545,50,50);
+    }
+    if(treeLevel==1)
+    {
+      if((tree1count>0)&&(tree1count<treeWait))
+        image(cooldown[tree1count*CDN/treeWait],125,545,50,50);
+    }
+    
+    if(treeLevel==2)
+    {
+      if((tree1count<treeWait)&&(trees==maxtrees))
+      {
+        if(!lev2tree)
+          recent=max(max(tree1count,tree2count),tree3count);
+        lev2tree=true;
+        int tc=max(max(tree1count,tree2count),tree3count);
+        image(cooldown[((tc-recent)*CDN)/(treeWait-recent)],125,545,50,50);
+      }
+      else
+        lev2tree=false;
+    }
+    if(astLevel>0)
+    {
+      if((cometCount>0)&&(cometCount<astWait))
+        image(cooldown[cometCount*CDN/(astWait+2)],205,545,50,50);
+    }
+    
+    if(spiritLevel==1&&(sbCount>0))
+      image(cooldown[sbCount*CDN/(spiritWait+2)],285,545,50,50);
+    if(bholeLevel==1&&(BHCount>0))
+      image(cooldown[BHCount*CDN/(bholeWait+2)],365,545,50,50);
   }
-  
+  }
   if(!intro)
   {
   fill(0,0,0);
@@ -417,30 +474,7 @@ void draw() {
     }
   }
   
-  if(pause)
-  {
-    image(pwash,width/2,height/2,width,height);
-    int pcreditsPosX=width/2,pinstPosX=width/2,pnewPosX=width/2,presPosX=width/2;
-    int pcreditsPosY=280, pinstPosY=310, pnewPosY=340, presPosY=250;
-    float scale=2;
-    image(ptitle,width/2,height/5);
-    if((mouseX>presPosX-88)&&(mouseX<presPosX+88)&&(mouseY>presPosY-10)&&(mouseY<presPosY+10))
-      image(presumegameh,presPosX,presPosY);
-    else
-      image(presumegame,presPosX,presPosY);
-    if((mouseX>pinstPosX-73)&&(mouseX<pinstPosX+73)&&(mouseY>pinstPosY-10)&&(mouseY<pinstPosY+10))
-      image(pinstructionsh,pinstPosX,pinstPosY);
-    else
-      image(pinstructions,pinstPosX,pinstPosY);
-    if((mouseX>pcreditsPosX-43)&&(mouseX<pcreditsPosX+43)&&(mouseY>pcreditsPosY-10)&&(mouseY<pcreditsPosY+10))
-      image(pcreditsh,pcreditsPosX,pcreditsPosY);
-    else
-      image(pcredits,pcreditsPosX,pcreditsPosY);
-    if((mouseX>pnewPosX-67)&&(mouseX<pnewPosX+67)&&(mouseY>pnewPosY-10)&&(mouseY<pnewPosY+10))
-      image(pnewgameh,pnewPosX,pnewPosY);
-    else
-      image(pnewgame,pnewPosX,pnewPosY);  
-  }
+  
   
   if(!intro)
   {
@@ -493,7 +527,8 @@ void draw() {
     sb.setStatic(true);
     world.add(sb);
     }
-    sbCount++;
+    if(!pause)
+      sbCount++;
     if(sbCount<=150)
     {
       pushMatrix();
@@ -508,13 +543,16 @@ void draw() {
     }
     if(sbCount>=150)
       world.remove(sb);
-    if(sbCount>500)
+    if(sbCount>spiritWait)
+    {
       createSB=false;
+      sbCount=0;
+    }
   }
   
   if(createComet)
   {
-    if(cometCount==0)
+    if(cometCount==0||((astLevel>1)&&(cometCount==75))||((astLevel>1)&&(cometCount==150)))
     {
     com1=new FCircle(20);
     com2=new FCircle(20);
@@ -555,16 +593,14 @@ void draw() {
     metsound.play();
     waves++;
     }
-    if(cometCount<73)
-    {
-      image(meteor,com1.getX(),com1.getY(),30,100);
-      image(meteor,com2.getX(),com2.getY(),30,100);
-      image(meteor,com3.getX(),com3.getY(),30,100);
-      image(meteor,com4.getX(),com4.getY(),30,100);
-      image(meteor,com5.getX(),com5.getY(),30,100);
-    }
-    cometCount++;
-    if(cometCount>73)
+    image(meteor,com1.getX(),com1.getY(),30,100);
+    image(meteor,com2.getX(),com2.getY(),30,100);
+    image(meteor,com3.getX(),com3.getY(),30,100);
+    image(meteor,com4.getX(),com4.getY(),30,100);
+    image(meteor,com5.getX(),com5.getY(),30,100);
+    if(!pause)
+      cometCount++;
+    if(cometCount==73||((astLevel>1)&&(cometCount==148))||((astLevel>1)&&(cometCount==223)))
     {
       world.remove(com1);
       world.remove(com2);
@@ -572,8 +608,6 @@ void draw() {
       world.remove(com4);
       world.remove(com5);
     }
-    if((cometCount>74)&&(waves<maxWaves))
-      cometCount=0;
     if(cometCount>astWait)
     {
       createComet=false;
@@ -606,10 +640,11 @@ void draw() {
       image(blackhole,0,0,75,75);
       popMatrix();
     }
-    BHCount++;
+    if(!pause)
+      BHCount++;
     if(BHCount>150)
       world.remove(BH);
-    if(BHCount>150)
+    if(BHCount>bholeWait)
     {
       createBH=false;
       BHCount=0;
@@ -620,7 +655,7 @@ void draw() {
   if (poly != null) {
     poly.draw(this);
   }
-  if(!pause&&!intro)
+  if((!pause)&&(!intro))
   {
   countR1++;
   if((countR1>waitR1)&(rob1<maxrob1))
@@ -631,7 +666,7 @@ void draw() {
   countR3++;
   if((countR3>waitR3)&(rob3<maxrob3))
     crob3=true;
-  } 
+  
   if(poly!=null)
   {
     fill(0,0,0,0);
@@ -646,7 +681,7 @@ void draw() {
   else
     image(rBox,minX+psize/2,minY+psize/2,psize,psize);
   }  
-  
+  }
   if(crob1&&!pause&&!intro)
   {  
     crob1=false;
@@ -800,13 +835,53 @@ void draw() {
      }
   }
   }
+  if(pause)
+  {
+    image(pwash,width/2,height/2,width,height);
+    int pcreditsPosX=width/2,pinstPosX=width/2,pnewPosX=width/2,presPosX=width/2;
+    int pcreditsPosY=280, pinstPosY=310, pnewPosY=340, presPosY=250;
+    float scale=2;
+    image(ptitle,width/2,height/5);
+    if((mouseX>presPosX-88)&&(mouseX<presPosX+88)&&(mouseY>presPosY-10)&&(mouseY<presPosY+10))
+    {
+      image(presumegameh,presPosX,presPosY);
+      pauseResumeHov=true;
+    }
+    else
+    {
+      image(presumegame,presPosX,presPosY);
+      pauseResumeHov=false;
+    }
+    if((mouseX>pinstPosX-73)&&(mouseX<pinstPosX+73)&&(mouseY>pinstPosY-10)&&(mouseY<pinstPosY+10))
+      image(pinstructionsh,pinstPosX,pinstPosY);
+    else
+      image(pinstructions,pinstPosX,pinstPosY);
+    if((mouseX>pcreditsPosX-43)&&(mouseX<pcreditsPosX+43)&&(mouseY>pcreditsPosY-10)&&(mouseY<pcreditsPosY+10))
+      image(pcreditsh,pcreditsPosX,pcreditsPosY);
+    else
+      image(pcredits,pcreditsPosX,pcreditsPosY);
+    if((mouseX>pnewPosX-67)&&(mouseX<pnewPosX+67)&&(mouseY>pnewPosY-10)&&(mouseY<pnewPosY+10))
+    {
+      image(pnewgameh,pnewPosX,pnewPosY);
+      pauseNGHov=true;
+    }
+    else
+    {
+      image(pnewgame,pnewPosX,pnewPosY); 
+      pauseNGHov=false;
+    } 
+  }
 }
 
 
 void mousePressed() {
   if(pause)
   {
-    
+    if(pauseResumeHov)
+      pauseResumeP=true;
+    if(pauseNGHov)
+      pauseNGP=true;
+    return;
   }
   if(intro)
   {
@@ -962,6 +1037,65 @@ void mouseDragged() {
 void mouseReleased() {
   if(pause)
   {
+    if(pauseNGP&&pauseNGHov)
+    {
+      pauseNGP=false;
+      health=100;
+      experience=0;
+      rockWait=100;treeWait=200;astWait=250;
+      score=0;
+      crob1=false;crob2=false;crob3=false;
+      waitR1=100;waitR2=1000;waitR3=3000;
+      pause=!pause;
+      rockLevel=1;treeLevel=0;astLevel=0;spiritLevel=0;bholeLevel=0;
+      nrockLevel=1;ntreeLevel=3;nastLevel=4;nspiritLevel=8;nbholeLevel=10;
+      FCircle r1,r2,r3;
+      createBH=createComet=createSB=tree1on=tree2on=tree3on=false;
+      tree1count=sbCount=cometCount=BHCount=tree2count=tree3count=0;
+      rockCount=100;
+      for(int i=0;i<rob1;i++)
+      {
+        destR1[i]=false;
+        r1=robot1.get(i);
+        world.remove(r1);
+      }
+      for(int i=0;i<rob2;i++)
+      {
+        destR2[i]=false;
+        r2=robot2.get(i);
+        world.remove(r2);
+      }
+      for(int i=0;i<rob3;i++)
+      {
+        destR3[i]=false;
+        r2=robot2.get(i);
+        world.remove(r2);
+      }
+      ArrayList <FBody> stones=world.getBodies();
+      for(int i=0;i<stones.size();i++)
+      {
+        FBody g=stones.get(i);
+        float x=g.getDensity();
+        if((x==10)||(x==13)||(x==12))
+          world.remove(g);
+      }
+      rob1=rob2=rob3=0;
+      robot1=new ArrayList<FCircle>();
+      robot2=new ArrayList<FCircle>();
+      robot3=new ArrayList<FCircle>();
+      bhSound.stop();
+      r3sound.stop();
+    }
+    if(pauseResumeHov&&pauseResumeP)
+    {
+      pause=!pause;
+      pauseResumeP=false;
+    }
+    if(pauseInstrHov&&pauseInstrP)
+    {
+      pauseInstrDo=true;
+      pauseInstrP=false;
+    }
     return;
   }
   if(intro)
@@ -970,7 +1104,8 @@ void mouseReleased() {
     {
       intro=false;
       health=100;
-      experience=0;
+      experience=20;
+      instPage=1;
       playP=false;
     }
     if(instrHov&&instrP)
@@ -1009,12 +1144,12 @@ void mouseReleased() {
         {
           rockWait=50;
           psize=150;
-          nrockLevel=3;
+          nrockLevel=2;
         }
         if(rockLevel==3)
         {
           psize=200;
-          rockWait=25;
+          rockWait=20;
           nrockLevel=0;
         }
     }
@@ -1037,6 +1172,7 @@ void mouseReleased() {
         if(nastLevel==2)
         {
           maxWaves=3;
+          astWait=450;
           nastLevel=0;
         }
         else
