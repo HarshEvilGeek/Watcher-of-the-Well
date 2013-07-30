@@ -26,6 +26,7 @@ boolean crob1=false,crob2=false,crob3=false;
 int waitR1=100,waitR2=1000,waitR3=3000;
 int rob1=0,maxrob1=250,countR1=0,rob2=0,maxrob2=150,countR2=0,rob3=0,maxrob3=100,countR3=0;
 int r1wait=100,r2wait=300,r3wait=400;
+int r1speed=12,r2speed,r3speed=400;
 boolean[] destR1,destR2,destR3;
 boolean groundTouch=false;
 boolean drawTree;
@@ -331,8 +332,8 @@ void draw() {
     }
   }
   }
-  image(background,width/2,height/2,width,height);
   image(tower,width/2+100,height/2-53,width/5,height/2.5);
+  image(background,width/2,height/2,width,height);
   if(!intro)
   {
   rockB.display();
@@ -689,7 +690,7 @@ void draw() {
     countR1=0;
     FCircle r1=new FCircle(40);
     r1.setPosition(-20,359);
-    r1.setAngularVelocity(12);
+    r1.setAngularVelocity(r1speed);
     r1.setFill(0,0,0,0);
     r1.setNoStroke();
     r1.setDensity(9);
@@ -792,7 +793,7 @@ void draw() {
     countR3=0;
     FCircle r3=new FCircle(30);
     r3.setPosition(-20,250);
-    r3.setVelocity(400,0);
+    r3.setVelocity(r3speed,0);
     r3.setFill(0,0,0,0);
     r3.setNoStroke();
     r3.setDensity(2);
@@ -812,7 +813,7 @@ void draw() {
        float r3x=r3.getX();
        float r3y=r3.getY();
        float r3angle=r3.getRotation();
-       r3.setVelocity(400,0);
+       r3.setVelocity(r3speed,0);
        pushMatrix();
        translate(r3x,r3y);
        rotate(r3angle);
@@ -1044,51 +1045,7 @@ void mouseReleased() {
     if(pauseNGP&&pauseNGHov)
     {
       pauseNGP=false;
-      health=100;
-      experience=0;
-      rockWait=100;treeWait=200;astWait=250;
-      score=0;
-      crob1=false;crob2=false;crob3=false;
-      waitR1=100;waitR2=1000;waitR3=3000;
-      pause=!pause;
-      rockLevel=1;treeLevel=0;astLevel=0;spiritLevel=0;bholeLevel=0;
-      nrockLevel=1;ntreeLevel=3;nastLevel=4;nspiritLevel=8;nbholeLevel=10;
-      FCircle r1,r2,r3;
-      createBH=createComet=createSB=tree1on=tree2on=tree3on=false;
-      tree1count=sbCount=cometCount=BHCount=tree2count=tree3count=0;
-      rockCount=100;
-      for(int i=0;i<rob1;i++)
-      {
-        destR1[i]=false;
-        r1=robot1.get(i);
-        world.remove(r1);
-      }
-      for(int i=0;i<rob2;i++)
-      {
-        destR2[i]=false;
-        r2=robot2.get(i);
-        world.remove(r2);
-      }
-      for(int i=0;i<rob3;i++)
-      {
-        destR3[i]=false;
-        r2=robot2.get(i);
-        world.remove(r2);
-      }
-      ArrayList <FBody> stones=world.getBodies();
-      for(int i=0;i<stones.size();i++)
-      {
-        FBody g=stones.get(i);
-        float x=g.getDensity();
-        if((x==10)||(x==13)||(x==12))
-          world.remove(g);
-      }
-      rob1=rob2=rob3=0;
-      robot1=new ArrayList<FCircle>();
-      robot2=new ArrayList<FCircle>();
-      robot3=new ArrayList<FCircle>();
-      bhSound.stop();
-      r3sound.stop();
+      restart();
     }
     if(pauseResumeHov&&pauseResumeP)
     {
@@ -1117,9 +1074,9 @@ void mouseReleased() {
     if(playHov&&playP)
     {
       intro=false;
-      health=100;
-      experience=20;
-      instPage=1;
+      experience=0;
+      if(health!=100||experience!=0)
+        restart();
       playP=false;
     }
     if(instrHov&&instrP)
@@ -1626,7 +1583,56 @@ void contactEnded(FContact c) {
   }
   
 }
-
+void restart()
+{
+      health=100;
+      instPage=1;
+      experience=0;
+      rockWait=100;treeWait=200;astWait=250;
+      score=0;
+      crob1=false;crob2=false;crob3=false;
+      waitR1=100;waitR2=1000;waitR3=3000;
+      countR1=countR2=countR3=0;
+      pause=false;
+      rockLevel=1;treeLevel=0;astLevel=0;spiritLevel=0;bholeLevel=0;
+      nrockLevel=1;ntreeLevel=3;nastLevel=4;nspiritLevel=8;nbholeLevel=10;
+      FCircle r1,r2,r3;
+      createBH=createComet=createSB=tree1on=tree2on=tree3on=false;
+      tree1count=sbCount=cometCount=BHCount=tree2count=tree3count=0;
+      rockCount=100;
+      for(int i=0;i<rob1;i++)
+      {
+        destR1[i]=false;
+        r1=robot1.get(i);
+        world.remove(r1);
+      }
+      for(int i=0;i<rob2;i++)
+      {
+        destR2[i]=false;
+        r2=robot2.get(i);
+        world.remove(r2);
+      }
+      for(int i=0;i<rob3;i++)
+      {
+        destR3[i]=false;
+        r2=robot2.get(i);
+        world.remove(r2);
+      }
+      ArrayList <FBody> stones=world.getBodies();
+      for(int i=0;i<stones.size();i++)
+      {
+        FBody g=stones.get(i);
+        float x=g.getDensity();
+        if((x==10)||(x==13)||(x==12))
+          world.remove(g);
+      }
+      rob1=rob2=rob3=0;
+      robot1=new ArrayList<FCircle>();
+      robot2=new ArrayList<FCircle>();
+      robot3=new ArrayList<FCircle>();
+      bhSound.stop();
+      r3sound.stop();
+}
 void keyPressed() {
   if ((key == 's'||key == 's')&&(createSB==false)&&(spiritLevel>0)) 
   {
