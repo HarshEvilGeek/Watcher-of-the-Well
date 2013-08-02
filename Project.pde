@@ -7,7 +7,8 @@ AudioPlayer exp,laser,treegrowth,r1sound1,r1sound2,r1sound3,r2sound,r3sound,mets
 PImage[] explosion,cooldown;
 int CDN=7;
 PImage[] num;
-PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh;
+PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh,creditstext,gobacktomenu,gobacktomenuh,page1text,page2text,page3text,page4text;
+PImage pausepage1text,pausepage2text,pausepage3text,pausepage4text, pausenext, pauseback, pausehome, pausenexth, pausebackh, pausehomeh, next, nexth, back, backh;
 int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 634, 785, 791, 820, 834, 865, 870};
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
 int gbits;
@@ -58,7 +59,7 @@ boolean pause=false, intro=true;
 boolean playHov=false,instrHov=false,creditsHov=false,playP=false,instrP=false,creditsP=false,instrDo=false,creditsDo=false;
 boolean GoBackMenuHov=false,GoBackMenuP=false,instrNextHov=false,instrNextP=false,instrBackHov=false,instrBackP=false;
 int instPage=1;
-boolean pauseResumeHov=false,pauseResumeP=false,pauseNGHov=false,pauseNGP=false,pauseInstrHov=false,pauseInstrP=false,pauseInstrDo=false;
+boolean pauseResumeHov=false,pauseResumeP=false,pauseNGHov=false,pauseNGP=false,pauseInstrHov=false,pauseInstrP=false,pauseInstrDo=false,pauseGBHov=false,pauseGBP=false;
 
 int recent;
 boolean lev2tree=false;
@@ -113,6 +114,27 @@ void setup() {
   presumegameh=loadImage("PResumeGameH.PNG");
   ptitle=loadImage("PTitle.PNG");
   pwash=loadImage("PWash.png"); 
+  pausepage1text=loadImage("PausePage1Text.png");
+  pausepage2text=loadImage("PausePage2Text.png");
+  pausepage3text=loadImage("PausePage3Text.png");
+  pausepage4text=loadImage("PausePage4Text.png");
+  pauseback=loadImage("PauseBack.png");
+  pausenext=loadImage("PauseNext.png");
+  pausehome=loadImage("PauseHome.png");
+  pausenexth=loadImage("PauseNextH.PNG");
+  pausebackh=loadImage("PauseBackH.png");
+  pausehomeh=loadImage("PauseHomeH.PNG");
+  creditstext=loadImage("CreditsText.png");
+  gobacktomenu=loadImage("GoBackToMenu.png");
+  gobacktomenuh=loadImage("GoBackToMenuH.png");
+  next=loadImage("Next.PNG");
+  nexth=loadImage("NextH.png");
+  back=loadImage("Back.png");
+  backh=loadImage("BackH.png");
+  page1text=loadImage("Page1Text.PNG");
+  page2text=loadImage("Page2Text.png");
+  page3text=loadImage("Page3Text.png");
+  page4text=loadImage("Page4Text.png");
   rockB=new Button(20,520,50,50);
   rockB.setImage(rockButton);
   treeB=new Button(100,520,50,50);
@@ -437,8 +459,10 @@ void draw() {
   }
   
   if(intro)
-  {
-    image(titlescreen,width/2,height/2,width,height);
+    {
+      image(titlescreen,width/2,height/2,width,height);
+    if((!instrDo)&&(!creditsDo))      
+    {
     int playPosX=100,instPosX=290,creditsPosX=500;
     int playPosY=324,instPosY=320,creditsPosY=320;
     float scale=2;
@@ -473,6 +497,70 @@ void draw() {
       image(credits,creditsPosX,creditsPosY,242/scale,56/scale);
       creditsHov=false;
     }
+  }
+  else if(creditsDo)
+  {
+   int homePosX=148;
+   int homePosY=389; 
+    image(creditstext,253,209);
+    if((mouseX>homePosX-60)&&(mouseX<homePosX+60)&&(mouseY>homePosY-15)&&(mouseY<homePosY+15))
+    {
+      image(gobacktomenuh,homePosX,homePosY);
+      GoBackMenuHov=true;
+    }
+    else
+    {
+      image(gobacktomenu,homePosX,homePosY);
+      GoBackMenuHov=false;
+    }
+  }
+   else if(instrDo)
+   {
+    int nextPosX=138, homePosX=148, backPosX=83;
+    int nextPosY=418, homePosY=389, backPosY=418;
+     if((mouseX>homePosX-60)&&(mouseX<homePosX+60)&&(mouseY>homePosY-15)&&(mouseY<homePosY+15))
+    {
+      image(gobacktomenuh,homePosX,homePosY);
+      GoBackMenuHov=true;
+    }
+    else
+    {
+      image(gobacktomenu,homePosX,homePosY);
+      GoBackMenuHov=false;
+    }
+    if((mouseX>nextPosX-25)&&(mouseX<nextPosX+25)&&(mouseY>nextPosY-9)&&(mouseY<nextPosY+9))
+    {
+      image(nexth,nextPosX,nextPosY);
+      instrNextHov=true;
+    }
+    else
+    {
+      image(next,nextPosX,nextPosY);
+      instrNextHov=false;
+    }
+   if((mouseX>backPosX-25)&&(mouseX<backPosX+25)&&(mouseY>backPosY-9)&&(mouseY<backPosY+9))
+    {
+      image(backh,backPosX,backPosY);
+      instrBackHov=true;
+    }
+    else
+    {
+      image(back,backPosX,backPosY);
+      instrBackHov=false;
+    }
+   if(instPage==1)
+    {image(page1text,253,197);
+    }
+   else if(instPage==2)
+    {image(page2text,253,197);
+    }
+   else if(instPage==3)
+    {image(page3text,253,197);
+    }
+   else if(instPage==4)
+    {image(page4text,253,197);
+    }
+  }
   }
   
   
@@ -839,8 +927,10 @@ void draw() {
   if(pause)
   {
     image(pwash,width/2,height/2,width,height);
-    int pcreditsPosX=width/2,pinstPosX=width/2,pnewPosX=width/2,presPosX=width/2;
-    int pcreditsPosY=280, pinstPosY=310, pnewPosY=340, presPosY=250;
+  if(!pauseInstrDo)
+  {
+    int pinstPosX=width/2,pnewPosX=width/2,presPosX=width/2;
+    int pinstPosY=280, pnewPosY=310, presPosY=250;
     float scale=2;
     image(ptitle,width/2,height/5);
     if((mouseX>presPosX-88)&&(mouseX<presPosX+88)&&(mouseY>presPosY-10)&&(mouseY<presPosY+10))
@@ -854,13 +944,15 @@ void draw() {
       pauseResumeHov=false;
     }
     if((mouseX>pinstPosX-73)&&(mouseX<pinstPosX+73)&&(mouseY>pinstPosY-10)&&(mouseY<pinstPosY+10))
-      image(pinstructionsh,pinstPosX,pinstPosY);
+      {
+        image(pinstructionsh,pinstPosX,pinstPosY);
+        pauseInstrHov=true;
+      }
     else
-      image(pinstructions,pinstPosX,pinstPosY);
-    if((mouseX>pcreditsPosX-43)&&(mouseX<pcreditsPosX+43)&&(mouseY>pcreditsPosY-10)&&(mouseY<pcreditsPosY+10))
-      image(pcreditsh,pcreditsPosX,pcreditsPosY);
-    else
-      image(pcredits,pcreditsPosX,pcreditsPosY);
+     { 
+       image(pinstructions,pinstPosX,pinstPosY);
+       pauseInstrHov=false;
+     }
     if((mouseX>pnewPosX-67)&&(mouseX<pnewPosX+67)&&(mouseY>pnewPosY-10)&&(mouseY<pnewPosY+10))
     {
       image(pnewgameh,pnewPosX,pnewPosY);
@@ -872,6 +964,49 @@ void draw() {
       pauseNGHov=false;
     } 
   }
+  else
+  {
+    int pnextPosX=520, pbackPosX=460, phomePosX=490;
+    int pnextPosY=400, pbackPosY=400, phomePosY=400;
+    
+    if((mouseX>pnextPosX-10)&&(mouseX<pnextPosX+10)&&(mouseY>pnextPosY-10)&&(mouseY<pnextPosY+10))
+      {image(pausenexth,520,400);
+       instrNextHov=true;
+      }
+     else 
+       {image(pausenext,520,400);
+         instrNextHov=false;
+       }
+     if((mouseX>pbackPosX-10)&&(mouseX<pbackPosX+10)&&(mouseY>pbackPosY-10)&&(mouseY<pbackPosY+10))
+      {image(pausebackh,460,400);
+       instrBackHov=true;
+      }  
+     else 
+      {image(pauseback,460,400);
+       instrBackHov=false;
+      }
+    if((mouseX>phomePosX-10)&&(mouseX<phomePosX+10)&&(mouseY>phomePosY-10)&&(mouseY<phomePosY+10))
+      {image(pausehomeh,490,400);
+       pauseGBHov=true;
+      }  
+     else 
+      {image(pausehome,490,400);
+       pauseGBP=false;
+      }
+    if(instPage==1)
+    {image(pausepage1text,490,200);
+    }
+    if(instPage==2)
+    {image(pausepage2text,490,200);
+    }
+    if(instPage==3)
+    {image(pausepage3text,490,200);
+    }
+    if(instPage==4)
+    {image(pausepage4text,490,200);
+    }
+ }
+}
 }
 
 
@@ -882,10 +1017,14 @@ void mousePressed() {
       pauseResumeP=true;
     if(pauseNGHov)
       pauseNGP=true;
+    if(pauseInstrHov)
+      pauseInstrP=true;
     if(instrNextHov)
       instrNextP=true;
     if(instrBackHov)
       instrBackP=true;
+    if(pauseGBHov)
+      pauseGBP=true;
     return;
   }
   if(intro)
@@ -1056,16 +1195,27 @@ void mouseReleased() {
     {
       pauseInstrDo=true;
       pauseInstrP=false;
+      pauseInstrHov=false;
     }
     if(instrNextP&&instrNextHov)
     {
       if(instPage<4)
         instPage++;
+      instrNextP=false;
+      instrNextHov=false;
     }
     if(instrBackP&&instrBackHov)
     {
       if(instPage>1)
         instPage--;
+      instrBackP=false;
+      instrBackHov=false;
+    }
+    if(pauseGBHov&&pauseGBP)
+    {
+      pauseGBP=false;
+      pauseInstrDo=false;
+      pauseGBHov=false;
     }
     return;
   }
@@ -1083,16 +1233,20 @@ void mouseReleased() {
     {
       instrDo=true;
       instrP=false;
+      instrHov=false;
     }
     if(creditsHov&&creditsP)
     {
       creditsDo=true;
       creditsP=false;
+      creditsHov=false;
     }
     if(GoBackMenuP&&GoBackMenuHov)
     {
+      GoBackMenuP=false;
       creditsDo=false;
       instrDo=false;
+      GoBackMenuHov=false;
     }
     if(instrNextP&&instrNextHov)
     {
@@ -1651,11 +1805,9 @@ void keyPressed() {
     BHPressed=true;  
     cometPressed=false;
   }
-  if(key==' ')
+  if((!intro)&&(key==' '))
   {
     pause=!pause;
+    pauseInstrDo=false;
   }
 }
-
-
-
