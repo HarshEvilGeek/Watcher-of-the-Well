@@ -972,6 +972,8 @@ void draw() {
     if((mouseX>pnextPosX-10)&&(mouseX<pnextPosX+10)&&(mouseY>pnextPosY-10)&&(mouseY<pnextPosY+10))
       {image(pausenexth,520,400);
        instrNextHov=true;
+       instrBackHov=false;
+       pauseGBHov=false;
       }
      else 
        {image(pausenext,520,400);
@@ -980,6 +982,8 @@ void draw() {
      if((mouseX>pbackPosX-10)&&(mouseX<pbackPosX+10)&&(mouseY>pbackPosY-10)&&(mouseY<pbackPosY+10))
       {image(pausebackh,460,400);
        instrBackHov=true;
+       instrNextHov=false;
+       pauseGBHov=false;
       }  
      else 
       {image(pauseback,460,400);
@@ -988,6 +992,8 @@ void draw() {
     if((mouseX>phomePosX-10)&&(mouseX<phomePosX+10)&&(mouseY>phomePosY-10)&&(mouseY<phomePosY+10))
       {image(pausehomeh,490,400);
        pauseGBHov=true;
+       instrBackHov=false;
+       instrNextHov=false;
       }  
      else 
       {image(pausehome,490,400);
@@ -1216,6 +1222,7 @@ void mouseReleased() {
       pauseGBP=false;
       pauseInstrDo=false;
       pauseGBHov=false;
+      instPage=1;
     }
     return;
   }
@@ -1247,6 +1254,7 @@ void mouseReleased() {
       creditsDo=false;
       instrDo=false;
       GoBackMenuHov=false;
+      instPage=1;
     }
     if(instrNextP&&instrNextHov)
     {
@@ -1741,7 +1749,7 @@ void restart()
 {
       health=100;
       instPage=1;
-      experience=0;
+      experience=30;
       rockWait=100;treeWait=200;astWait=250;
       score=0;
       crob1=false;crob2=false;crob3=false;
