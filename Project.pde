@@ -5,7 +5,7 @@ FPoly poly;
 Maxim maxim;
 AudioPlayer exp,laser,treegrowth,r1sound1,r1sound2,r1sound3,r2sound,r3sound,metsound,bhSound,spiritSound;
 PImage[] explosion,cooldown;
-int CDN=7;
+int CDN=13;
 PImage[] num;
 PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh,creditstext,gobacktomenu,gobacktomenuh,page1text,page2text,page3text,page4text;
 PImage pausepage1text,pausepage2text,pausepage3text,pausepage4text, pausenext, pauseback, pausehome, pausenexth, pausebackh, pausehomeh, next, nexth, back, backh;
@@ -13,7 +13,7 @@ int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
 int gbits;
 int count=0;
-int rockWait=100,treeWait=200,astWait=250,spiritWait=750,bholeWait=750;
+int rockWait=75,treeWait=200,astWait=250,spiritWait=750,bholeWait=750;
 float psize=100;
 float maxX=0,maxY=0,minX=1000,minY=1000,maxYsX,minXsY;
 ArrayList<FPoly> grounds;
@@ -431,7 +431,7 @@ void draw() {
   if(score>nextExperiencePoint)
   {
     experience++;
-    nextExperiencePoint+=200;
+    nextExperiencePoint+=90;
   }
   rockCount++;
   
@@ -1275,14 +1275,14 @@ void mouseReleased() {
         experience-=nrockLevel;
         if(rockLevel==2)
         {
-          rockWait=50;
+          rockWait=30;
           psize=150;
           nrockLevel=2;
         }
         if(rockLevel==3)
         {
           psize=200;
-          rockWait=20;
+          rockWait=10;
           nrockLevel=0;
         }
     }
@@ -1749,8 +1749,10 @@ void restart()
 {
       health=100;
       instPage=1;
-      experience=30;
-      rockWait=100;treeWait=200;astWait=250;
+      experience=0;
+      rockWait=75;treeWait=200;astWait=250;
+      psize=100;
+      maxtrees=1;
       score=0;
       crob1=false;crob2=false;crob3=false;
       waitR1=100;waitR2=1000;waitR3=3000;
