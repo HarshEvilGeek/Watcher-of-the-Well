@@ -663,11 +663,11 @@ void draw() {
     com3.setDensity(12);
     com4.setDensity(12);
     com5.setDensity(12);
-    com1.setVelocity(-80,10);
-    com2.setVelocity(-80,10);
-    com3.setVelocity(-80,10);
-    com4.setVelocity(-80,10);
-    com5.setVelocity(-80,10);
+    com1.setVelocity(-80,100);
+    com2.setVelocity(-80,100);
+    com3.setVelocity(-80,100);
+    com4.setVelocity(-80,100);
+    com5.setVelocity(-80,100);
     com1.setPosition(cometX-40,-30);
     com2.setPosition(cometX,-30);
     com3.setPosition(cometX+40,-30);
