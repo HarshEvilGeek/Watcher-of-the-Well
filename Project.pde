@@ -424,8 +424,6 @@ void draw() {
   }
   if(!intro)
   {
-  fill(0,0,0);
-  textSize(20);
   image(scoreText,866,50,140,15);
   image(Numbers[score/10000],890,50,20,17);
   image(Numbers[(score/1000)%10],903,50,20,17);
