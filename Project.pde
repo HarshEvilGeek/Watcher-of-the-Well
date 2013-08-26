@@ -11,6 +11,7 @@ PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh,creditstext,go
 PImage pausepage1text,pausepage2text,pausepage3text,pausepage4text, pausenext, pauseback, pausehome, pausenexth, pausebackh, pausehomeh, next, nexth, back, backh;
 PImage scoreText,expText;
 PImage[] Numbers;
+PFont aharoni20;
 int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 634, 785, 791, 820, 834, 865, 870};
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
 int gbits;
@@ -140,6 +141,7 @@ void setup() {
   scoreText=loadImage("Writing/SCORE.png");
   expText=loadImage("Writing/Experience.png");
   Numbers=loadImages("Writing/Numbers/num",".png",10);
+  aharoni20=loadFont("Aharoni-Bold-20.vlw");
   rockB=new Button(20,520,50,50);
   rockB.setImage(rockButton);
   treeB=new Button(100,520,50,50);
@@ -416,9 +418,9 @@ void draw() {
   if(!intro)
   {
   fill(0,0,0);
-  textSize(20);
-  text("SCORE: "+score,845,50);
-  text("EXPERIENCE: "+experience,845,85);
+  textFont(aharoni20,20);
+  text("SCORE: "+score,745,70);
+  text("EXPERIENCE: "+experience,745,105);
   fill(0,0,0);
   rect(width-445,110,102,8);
   if(health>75)
@@ -572,8 +574,8 @@ void draw() {
   
   if(!intro)
   {
-  textSize(10);
   fill(0,0,0);
+  textFont(aharoni20,10);
   text("Draw in Sky",17,590);
   text("Drag Ground Up",88,590);
   text("A + Click",183,590);
