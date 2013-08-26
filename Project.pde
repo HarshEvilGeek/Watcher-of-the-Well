@@ -1112,7 +1112,7 @@ void mousePressed() {
     bpressed=true;
   if (world.getBody(mouseX, mouseY) != null) {
     FBody b=world.getBody(mouseX,mouseY);
-    if((b.getDensity()==0.1)&&(trees<maxtrees))
+    if((b.getDensity()==0.1)&&(trees<maxtrees)&&(!drawTree))
     {
       drawTree=true;
     }
@@ -1215,7 +1215,7 @@ void mouseDragged() {
       float x=b.getDensity();
       if(x==2||x==0.1||x==8||x==5||x==10||x==13||x==9)
       {
-        if(!gotPosition)
+        if((!gotPosition)&&(x!=0.1))
         {
         treex=mouseX;
         treey=mouseY+5;
@@ -1806,10 +1806,10 @@ void restart()
       levelwait=100;
       rockWait=75;treeWait=200;astWait=250;
       psize=100;
-      maxtrees=1;
+      maxtrees=0;
       score=0;
       crob1=false;crob2=false;crob3=false;
-      waitR1=100;waitR2=1000;waitR3=3000;
+      waitR1=200;waitR2=3400;waitR3=10000;
       countR1=countR2=countR3=0;
       pause=false;
       rockLevel=1;treeLevel=0;astLevel=0;spiritLevel=0;bholeLevel=0;
