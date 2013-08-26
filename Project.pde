@@ -9,12 +9,13 @@ int CDN=13;
 PImage[] num;
 PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh,creditstext,gobacktomenu,gobacktomenuh,page1text,page2text,page3text,page4text;
 PImage pausepage1text,pausepage2text,pausepage3text,pausepage4text, pausenext, pauseback, pausehome, pausenexth, pausebackh, pausehomeh, next, nexth, back, backh;
-PImage scoreText,expText;
+PImage levelText,comboText,krakenText;
 PImage[] Numbers;
 PFont aharoni20;
 int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 634, 785, 791, 820, 834, 865, 870};
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
 int gbits;
+int level=0,levelwait=100,levelCount=0;
 int count=0;
 int rockWait=75,treeWait=200,astWait=250,spiritWait=750,bholeWait=750;
 float psize=100;
@@ -27,10 +28,10 @@ PImage background, sky, tower, Robot1, Robot2, Robot3, tree, meteor, spirit, bla
 PImage rockButton,treeButton,astButton,spiritButton,bholeButton,rBox;
 PImage pcredits,pcreditsh,pinstructions,pinstructionsh,pnewgame,pnewgameh,presumegame,presumegameh,ptitle,pwash;
 boolean crob1=false,crob2=false,crob3=false;
-int waitR1=100,waitR2=1000,waitR3=3000;
+int waitR1=200,waitR2=3400,waitR3=10000;
 int rob1=0,maxrob1=250,countR1=0,rob2=0,maxrob2=150,countR2=0,rob3=0,maxrob3=100,countR3=0;
-int r1wait=100,r2wait=300,r3wait=400;
-int r1speed=12,r2speed,r3speed=400;
+int r1wait=300,r2wait=500,r3wait=600;
+int r1speed=5,r2speed=7,r3speed=0;
 boolean[] destR1,destR2,destR3;
 boolean groundTouch=false;
 boolean drawTree;
@@ -138,9 +139,10 @@ void setup() {
   page2text=loadImage("Page2Text.png");
   page3text=loadImage("Page3Text.png");
   page4text=loadImage("Page4Text.png");
-  scoreText=loadImage("Writing/SCORE.png");
-  expText=loadImage("Writing/Experience.png");
-  Numbers=loadImages("Writing/Numbers/num",".png",10);
+  levelText=loadImage("Writing/Level.png");
+  comboText=loadImage("Writing/COMBO X.png");
+  krakenText=loadImage("Writing/Kraken.png");
+  Numbers=loadImages("Writing/Numbers/n",".png",10);
   aharoni20=loadFont("Aharoni-Bold-20.vlw");
   rockB=new Button(20,520,50,50);
   rockB.setImage(rockButton);
@@ -273,6 +275,48 @@ void draw() {
   image(sky,width/2,height/2,width,height);
   tint(255,255,255);
   
+  levelCount++;
+  if(levelCount>levelwait)
+  {
+    if(level<5)
+    {
+      if(levelCount<(levelwait+255))
+      {
+        tint(255,(levelCount-levelwait));
+        image(levelText,320,200,160,40);
+        image(Numbers[level+1],425,200,51,40);
+        tint(255);
+      }
+      else
+      {
+        levelwait=3000;
+        levelCount=0;
+        level++;
+        r1speed+=1;
+        r2speed+=1;
+        r3speed+=50;
+      }
+    }
+    else
+    {
+      if((levelCount<(levelwait+255))&&(level==5))
+      {
+        tint(255,(levelCount-levelwait));
+        image(krakenText,320,200,160,40);
+        tint(255);
+      }
+      else
+      {
+        levelwait=3000;
+        levelCount=0;
+        level++;
+        r1speed++;
+        r2speed++;
+        r3speed+=25;
+      }
+      
+    }
+  }
   if(tree1on)
   {
     if(!pause)
@@ -812,7 +856,7 @@ void draw() {
        else
          r1sound3.play();
        }
-       r1.setAngularVelocity(12);
+       r1.setAngularVelocity(r1speed);
        pushMatrix();
        translate(r1x,r1y);
        rotate(r1angle);
@@ -840,7 +884,7 @@ void draw() {
     countR2=0;
     FCircle r2=new FCircle(40);
     r2.setPosition(-20,300);
-    r2.setVelocity(35,-40);
+    r2.setVelocity(125,-40);
     r2.setRestitution(1.1);
     r2.setFill(0,0,0,0);
     r2.setNoStroke();
@@ -859,7 +903,7 @@ void draw() {
        float r2x=r2.getX();
        float r2y=r2.getY();
        float r2angle=r2.getRotation();
-       r2.setAngularVelocity(14);
+       r2.setAngularVelocity(r2speed);
        pushMatrix();
        translate(r2x,r2y);
        rotate(r2angle);
@@ -1758,6 +1802,8 @@ void restart()
       health=100;
       instPage=1;
       experience=0;
+      level=levelCount=0;
+      levelwait=100;
       rockWait=75;treeWait=200;astWait=250;
       psize=100;
       maxtrees=1;
