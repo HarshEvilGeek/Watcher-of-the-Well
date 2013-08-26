@@ -9,6 +9,9 @@ int CDN=13;
 PImage[] num;
 PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh,creditstext,gobacktomenu,gobacktomenuh,page1text,page2text,page3text,page4text;
 PImage pausepage1text,pausepage2text,pausepage3text,pausepage4text, pausenext, pauseback, pausehome, pausenexth, pausebackh, pausehomeh, next, nexth, back, backh;
+PImage scoreText,expText;
+PImage rockText,treeText,astText,spiritText,bholeText,SpellLevel,ToAcquire,ToUpgrade,Final;
+PImage[] Numbers;
 int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 634, 785, 791, 820, 834, 865, 870};
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
 int gbits;
@@ -82,7 +85,7 @@ void setup() {
     destR3[i]=false;
   background=loadImage("Background1.png");
   sky=loadImage("Sky.png");
-  tower=loadImage("Tower.png");
+  tower=loadImage("tower.png");
   Robot1=loadImage("Robot1.png");
   Robot2=loadImage("Robot2.png");
   Robot3=loadImage("Robot3.png");
@@ -131,10 +134,21 @@ void setup() {
   nexth=loadImage("NextH.png");
   back=loadImage("Back.png");
   backh=loadImage("BackH.png");
-  page1text=loadImage("Page1Text.PNG");
+  page1text=loadImage("Page1Text.png");
   page2text=loadImage("Page2Text.png");
   page3text=loadImage("Page3Text.png");
   page4text=loadImage("Page4Text.png");
+  scoreText=loadImage("Writing/SCORE.png");
+  expText=loadImage("Writing/Experience.png");
+  Numbers=loadImages("Writing/Numbers/num",".png",10);
+  rockText=loadImage("Writing/draw in sky.png");
+  treeText=loadImage("Writing/drag ground up.png");
+  astText=loadImage("Writing/A+CLICK.png");
+  spiritText=loadImage("Writing/S+DRAG.png");
+  bholeText=loadImage("Writing/D+CLICK.png");
+  SpellLevel=loadImage("Writing/LEVEL.png");
+  ToAcquire=loadImage("Writing/TO ACQUIRE.png");
+  ToUpgrade=loadImage("Writing/TO UPGRADE.png");
   rockB=new Button(20,520,50,50);
   rockB.setImage(rockButton);
   treeB=new Button(100,520,50,50);
@@ -412,8 +426,15 @@ void draw() {
   {
   fill(0,0,0);
   textSize(20);
-  text("Score: " + score, 842, 50);
-  text("Experience: " + experience, 790, 85);
+  image(scoreText,866,50,140,15);
+  image(Numbers[score/10000],890,50,20,17);
+  image(Numbers[(score/1000)%10],903,50,20,17);
+  image(Numbers[(score/100)%10],916,50,20,17);
+  image(Numbers[(score/10)%10],929,50,20,17);
+  image(Numbers[score%10],942,50,20,17);
+  image(expText,800,85,140,15);
+  image(Numbers[experience/10],890,85,20,17);
+  image(Numbers[experience%10],903,85,20,17);
   fill(0,0,0);
   rect(width-445,110,102,8);
   if(health>75)
@@ -1745,6 +1766,7 @@ void contactEnded(FContact c) {
   }
   
 }
+
 void restart()
 {
       health=100;
@@ -1797,6 +1819,7 @@ void restart()
       bhSound.stop();
       r3sound.stop();
 }
+
 void keyPressed() {
   if ((key == 's'||key == 's')&&(createSB==false)&&(spiritLevel>0)) 
   {
@@ -1812,7 +1835,7 @@ void keyPressed() {
   }
   if ((key == 'd'||key == 'D')&&(createBH==false)&&(bholeLevel>0)) 
   {
-    BHPressed=true;  
+    BHPressed=true;
     cometPressed=false;
   }
   if((!intro)&&(key==' '))
