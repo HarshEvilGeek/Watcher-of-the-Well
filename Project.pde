@@ -6,11 +6,13 @@ Maxim maxim;
 AudioPlayer exp,laser,treegrowth,r1sound1,r1sound2,r1sound3,r2sound,r3sound,metsound,bhSound,spiritSound;
 PImage[] explosion,cooldown;
 int CDN=13;
+int s;
 PImage[] num;
 PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh,creditstext,gobacktomenu,gobacktomenuh,page1text,page2text,page3text,page4text;
 PImage pausepage1text,pausepage2text,pausepage3text,pausepage4text, pausenext, pauseback, pausehome, pausenexth, pausebackh, pausehomeh, next, nexth, back, backh;
 PImage levelText,comboText,krakenText;
 PImage[] Numbers;
+PImage[] sentinel;
 PFont aharoni20;
 int[] gvx={-40, 65, 138, 201, 258, 297, 332, 362, 373, 402, 418, 440, 516, 550, 634, 785, 791, 820, 834, 865, 870};
 int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384, 366, 360, 495, 534, 564, 604, 636};
@@ -27,10 +29,11 @@ ArrayList<FCircle> robot3;
 PImage background, sky, tower, Robot1, Robot2, Robot3, tree, meteor, spirit, blackhole;
 PImage rockButton,treeButton,astButton,spiritButton,bholeButton,rBox;
 PImage pcredits,pcreditsh,pinstructions,pinstructionsh,pnewgame,pnewgameh,presumegame,presumegameh,ptitle,pwash;
+PImage[] healthbar;
 boolean crob1=false,crob2=false,crob3=false;
-int waitR1=200,waitR2=3400,waitR3=10000;
+int waitR1=300,waitR2=3400,waitR3=10000;
 int rob1=0,maxrob1=250,countR1=0,rob2=0,maxrob2=150,countR2=0,rob3=0,maxrob3=100,countR3=0;
-int r1wait=300,r2wait=500,r3wait=600;
+int r1wait=350,r2wait=550,r3wait=650;
 int r1speed=5,r2speed=7,r3speed=0;
 boolean[] destR1,destR2,destR3;
 boolean groundTouch=false;
@@ -139,11 +142,13 @@ void setup() {
   page2text=loadImage("Page2Text.png");
   page3text=loadImage("Page3Text.png");
   page4text=loadImage("Page4Text.png");
-  levelText=loadImage("Writing/Level.png");
+  levelText=loadImage("Writing/LEVEL.png");
   comboText=loadImage("Writing/COMBO X.png");
   krakenText=loadImage("Writing/Kraken.png");
   Numbers=loadImages("Writing/Numbers/n",".png",10);
   aharoni20=loadFont("Aharoni-Bold-20.vlw");
+  healthbar=loadImages("Health Bar/hb",".png",21);
+  sentinel=loadImages("Sentinel/Sentinel",".png",3);
   rockB=new Button(20,520,50,50);
   rockB.setImage(rockButton);
   treeB=new Button(100,520,50,50);
@@ -265,6 +270,7 @@ void setup() {
   gbits+=3;
   world.add(tow2);
   imageMode(CENTER);
+  s=0;
 }
 
 void draw() {
@@ -283,8 +289,8 @@ void draw() {
       if(levelCount<(levelwait+255))
       {
         tint(255,(levelCount-levelwait));
-        image(levelText,320,200,160,40);
-        image(Numbers[level+1],425,200,51,40);
+        image(levelText,width/2 - 90,height/2);
+        image(Numbers[level+1],width/2, height/2);
         tint(255);
       }
       else
@@ -295,6 +301,9 @@ void draw() {
         r1speed+=1;
         r2speed+=1;
         r3speed+=50;
+        r1wait-=25;
+        r2wait-=25;
+        r3wait-=25;
       }
     }
     else
@@ -302,12 +311,15 @@ void draw() {
       if((levelCount<(levelwait+255))&&(level==5))
       {
         tint(255,(levelCount-levelwait));
-        image(krakenText,320,200,160,40);
+      image(krakenText,width/2-100,height/2-100);
         tint(255);
       }
       else
       {
-        levelwait=3000;
+        levelwait=500;
+        r1wait=min(r1wait-=25,0);
+        r2wait=min(r2wait-=25,0);
+        r2wait=min(r2wait-=25,0);
         levelCount=0;
         level++;
         r1speed++;
@@ -324,6 +336,10 @@ void draw() {
     float imght;
     if(tree1count<=20)
     {
+      if(tree1count<=10)
+        s=2;
+      else
+        s=1;
       tree1.setPosition(0,-(tree1count*tree1height/20));
       imght=tree1height*(float)tree1count/20;
     }
@@ -353,6 +369,10 @@ void draw() {
     float imght;
     if(tree2count<=20)
     {
+      if(tree2count<=10)
+        s=2;
+      else
+        s=1;
       tree2.setPosition(0,-(tree2count*tree2height/20));
       imght=tree2height*(float)tree2count/20;
     }
@@ -382,6 +402,10 @@ void draw() {
     float imght;
     if(tree3count<=20)
     {
+      if(tree3count<=10)
+        s=2;
+      else
+        s=1;
       tree3.setPosition(0,-(tree3count*tree3height/20));
       imght=tree3height*(float)tree3count/20;
     }
@@ -404,77 +428,72 @@ void draw() {
       trees--;
     }
   }
-  }
+  
+  image(sentinel[s],(17*width)/30+4,(38*height)/108-3);
+  s=0;
   image(tower,width/2+100,height/2-53,width/5,height/2.5);
   image(background,width/2,height/2,width,height);
+  }
   if(!intro)
   {
-  rockB.display();
-  treeB.display();
-  astB.display();
-  spiritB.display();
-  bholeB.display();
-  if(treeLevel==0)
-    image(cooldown[0],125,545,50,50);
-  if(astLevel==0)
-    image(cooldown[0],205,545,50,50);
-  if(spiritLevel==0)
-    image(cooldown[0],285,545,50,50);
-  if(bholeLevel==0)
-    image(cooldown[0],365,545,50,50);
-  if(!pause)
-  {
-    if(rockCount<rockWait)
+    rockB.display();
+    treeB.display();
+    astB.display();
+    spiritB.display();
+    bholeB.display();
+    if(treeLevel==0)
+      image(cooldown[0],125,545,50,50);
+    if(astLevel==0)
+      image(cooldown[0],205,545,50,50);
+    if(spiritLevel==0)
+      image(cooldown[0],285,545,50,50);
+    if(bholeLevel==0)
+      image(cooldown[0],365,545,50,50);
+    if(!pause)
     {
-      image(cooldown[rockCount*CDN/rockWait],45,545,50,50);
-    }
-    if(treeLevel==1)
-    {
-      if((tree1count>0)&&(tree1count<treeWait))
-        image(cooldown[tree1count*CDN/treeWait],125,545,50,50);
-    }
-    
-    if(treeLevel==2)
-    {
-      if((tree1count<treeWait)&&(trees==maxtrees))
+      if(rockCount<rockWait)
       {
-        if(!lev2tree)
-          recent=max(max(tree1count,tree2count),tree3count);
-        lev2tree=true;
-        int tc=max(max(tree1count,tree2count),tree3count);
-        image(cooldown[((tc-recent)*CDN)/(treeWait-recent)],125,545,50,50);
+        image(cooldown[rockCount*CDN/rockWait],45,545,50,50);
       }
-      else
-        lev2tree=false;
-    }
-    if(astLevel>0)
-    {
-      if((cometCount>0)&&(cometCount<astWait))
-        image(cooldown[cometCount*CDN/(astWait+2)],205,545,50,50);
+      if(treeLevel==1)
+      {
+        if((tree1count>0)&&(tree1count<treeWait))
+          image(cooldown[tree1count*CDN/treeWait],125,545,50,50);
+      }
+      
+      if(treeLevel==2)
+      {
+        if((tree1count<treeWait)&&(trees==maxtrees))
+        {
+          if(!lev2tree)
+            recent=max(max(tree1count,tree2count),tree3count);
+          lev2tree=true;
+          int tc=max(max(tree1count,tree2count),tree3count);
+          image(cooldown[((tc-recent)*CDN)/(treeWait-recent)],125,545,50,50);
+        }
+        else
+          lev2tree=false;
+      }
+      if(astLevel>0)
+      {
+        if((cometCount>0)&&(cometCount<astWait))
+          image(cooldown[cometCount*CDN/(astWait+2)],205,545,50,50);
+      }
+      
+      if(spiritLevel==1&&(sbCount>0))
+        image(cooldown[sbCount*CDN/(spiritWait+2)],285,545,50,50);
+      if(bholeLevel==1&&(BHCount>0))
+        image(cooldown[BHCount*CDN/(bholeWait+2)],365,545,50,50);
     }
     
-    if(spiritLevel==1&&(sbCount>0))
-      image(cooldown[sbCount*CDN/(spiritWait+2)],285,545,50,50);
-    if(bholeLevel==1&&(BHCount>0))
-      image(cooldown[BHCount*CDN/(bholeWait+2)],365,545,50,50);
+    fill(0,0,0);
+    textFont(aharoni20,20);
+    text("SCORE: "+score,745,70);
+    text("EXPERIENCE: "+experience,745,105);
+    int h=max(health,0);
+    image(healthbar[h/5],(3*width)/5,(height*2)/11,102,8);
   }
-  }
-  if(!intro)
-  {
-  fill(0,0,0);
-  textFont(aharoni20,20);
-  text("SCORE: "+score,745,70);
-  text("EXPERIENCE: "+experience,745,105);
-  fill(0,0,0);
-  rect(width-445,110,102,8);
-  if(health>75)
-    fill(0,255,0);
-  else if(health>25)
-    fill(255,255,0);
-  else
-    fill(255,0,0);
-  rect(width-444,111,max(health,0),6);
-  }
+  
   if((!pause)&&(!intro))
     world.step();
   world.draw(this); 
@@ -482,7 +501,7 @@ void draw() {
   if(score>nextExperiencePoint)
   {
     experience++;
-    nextExperiencePoint+=90;
+    nextExperiencePoint+=150;
   }
   rockCount++;
   
@@ -679,7 +698,7 @@ void draw() {
       else
         image(spirit,0,0,50,50);
       popMatrix();
-      
+      s=2;
     }
     if(sbCount>=150)
       world.remove(sb);
@@ -733,6 +752,13 @@ void draw() {
     metsound.play();
     waves++;
     }
+    if(cometCount<25)
+    {
+      if(cometCount<12)
+        s=1;
+      else
+        s=2;
+    }
     image(meteor,com1.getX(),com1.getY(),30,100);
     image(meteor,com2.getX(),com2.getY(),30,100);
     image(meteor,com3.getX(),com3.getY(),30,100);
@@ -742,6 +768,7 @@ void draw() {
       cometCount++;
     if(cometCount==73||((astLevel>1)&&(cometCount==148))||((astLevel>1)&&(cometCount==223)))
     {
+      metsound.stop();
       world.remove(com1);
       world.remove(com2);
       world.remove(com3);
@@ -779,6 +806,7 @@ void draw() {
       rotate(-(float)BHCount/10);
       image(blackhole,0,0,75,75);
       popMatrix();
+      s=1;
     }
     if(!pause)
       BHCount++;
@@ -810,6 +838,7 @@ void draw() {
   if(poly!=null)
   {
     fill(0,0,0,0);
+    s=1;
   if((maxX-minX<psize/2)&&(maxY-minY<psize/2))
   {
     image(rBox,mouseX,mouseY,psize,psize);
@@ -1801,7 +1830,7 @@ void restart()
 {
       health=100;
       instPage=1;
-      experience=0;
+      experience=30;
       level=levelCount=0;
       levelwait=100;
       rockWait=75;treeWait=200;astWait=250;
@@ -1810,6 +1839,7 @@ void restart()
       score=0;
       crob1=false;crob2=false;crob3=false;
       waitR1=200;waitR2=3400;waitR3=10000;
+      r1wait=300;r2wait=500;r3wait=600;
       countR1=countR2=countR3=0;
       pause=false;
       rockLevel=1;treeLevel=0;astLevel=0;spiritLevel=0;bholeLevel=0;
