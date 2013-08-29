@@ -7,6 +7,7 @@ AudioPlayer exp,laser,treegrowth,r1sound1,r1sound2,r1sound3,r2sound,r3sound,mets
 PImage[] explosion,cooldown;
 int CDN=13;
 int s;
+int dispScore=0;
 PImage[] num;
 PImage titlescreen,title,play,playh,instr,instrh,credits,creditsh,creditstext,gobacktomenu,gobacktomenuh,page1text,page2text,page3text,page4text;
 PImage pausepage1text,pausepage2text,pausepage3text,pausepage4text, pausenext, pauseback, pausehome, pausenexth, pausebackh, pausehomeh, next, nexth, back, backh;
@@ -19,7 +20,7 @@ int[] gvy={380, 380, 372, 355, 428, 428, 414, 427, 426, 395, 392, 407, 394, 384,
 int gbits;
 int level=0,levelwait=100,levelCount=0;
 int count=0;
-int rockWait=75,treeWait=200,astWait=250,spiritWait=750,bholeWait=750;
+int rockWait=125,treeWait=450,astWait=400,spiritWait=1250,bholeWait=1250;
 float psize=100;
 float maxX=0,maxY=0,minX=1000,minY=1000,maxYsX,minXsY;
 ArrayList<FPoly> grounds;
@@ -34,7 +35,8 @@ boolean crob1=false,crob2=false,crob3=false;
 int waitR1=300,waitR2=3400,waitR3=10000;
 int rob1=0,maxrob1=250,countR1=0,rob2=0,maxrob2=150,countR2=0,rob3=0,maxrob3=100,countR3=0;
 int r1wait=350,r2wait=550,r3wait=650;
-int r1speed=5,r2speed=7,r3speed=0;
+int r1speed=5,r2speed=7,r2boost=0,r3speed=0;
+boolean r3rand=false;
 boolean[] destR1,destR2,destR3;
 boolean groundTouch=false;
 boolean drawTree;
@@ -240,7 +242,7 @@ void setup() {
   grounds.add(edge);
   world.add(edge);
   tow1.setFill(0, 0, 0, 0);
-  tow1.setDensity(0);
+  tow1.setDensity(1.5);
   tow1.setStatic(true);
   tow1.setNoStroke();
   tow1.setRestitution(0.5);
@@ -253,7 +255,7 @@ void setup() {
   grounds.add(tow1);
   world.add(tow1);
   tow2.setFill(0, 0, 0, 0);
-  tow2.setDensity(0);
+  tow2.setDensity(1.5);
   tow2.setStatic(true);
   tow2.setRestitution(0.5);
   tow2.setNoStroke();
@@ -293,7 +295,7 @@ void draw() {
     comboKill=killcount;
   }
   
-  if((BHCount>1)&&(BHCount<150))
+  if((BHCount>1)&&(BHCount<300))
     tint(200,200,255);
   image(sky,width/2,height/2,width,height);
   tint(255,255,255);
@@ -301,6 +303,8 @@ void draw() {
   int combolength=240;//how long you want it to stay
   if(comboCount>=0)
   {
+    if(comboCount==0)
+      score+=comboKill*10*comboKill;
     tint(255,comboCount);
     image(comboText,comboX+10,comboY-10,200,20);
     if(comboKill>9)
@@ -311,7 +315,9 @@ void draw() {
     if(comboCount>combolength)
       comboCount=-1;
   }
-  levelCount++;
+  
+  if(!pause)
+    levelCount++;
   if(levelCount>levelwait)
   {
     if(level<5)
@@ -328,9 +334,14 @@ void draw() {
         levelwait=3000;
         levelCount=0;
         level++;
+        if(level==5)
+          r3rand=true;
         r1speed+=1;
         r2speed+=1;
         r3speed+=50;
+        r2boost+=10;
+        if(level>3)
+          r2boost+=10;
         r1wait-=25;
         r2wait-=25;
         r3wait-=25;
@@ -341,18 +352,19 @@ void draw() {
       if((levelCount<(levelwait+255))&&(level==5))
       {
         tint(255,(levelCount-levelwait));
-      image(krakenText,width/2-100,height/2-100);
+        image(krakenText,width/2-100,height/2-100);
         tint(255);
       }
       else
       {
         levelwait=500;
-        r1wait=min(r1wait-=25,0);
-        r2wait=min(r2wait-=25,0);
-        r2wait=min(r2wait-=25,0);
+        r1wait=max(r1wait-=25,0);
+        r2wait=max(r2wait-=25,0);
+        r2wait=max(r2wait-=25,0);
         levelCount=0;
         level++;
         r1speed++;
+        r2boost+=10;
         r2speed++;
         r3speed+=25;
       }
@@ -373,18 +385,19 @@ void draw() {
       tree1.setPosition(0,-(tree1count*tree1height/20));
       imght=tree1height*(float)tree1count/20;
     }
-    else if(tree1count>130)
+    else if(tree1count>280)
     {
-      tree1.setPosition(0,-((150-tree1count)*tree1height/20));
-      imght=tree1height*(float)(150-tree1count)/20;
+      tree1.setPosition(0,-((300-tree1count)*tree1height/20));
+      imght=tree1height*(float)(300-tree1count)/20;
     }
     else
       imght=tree1height;
-    image(tree,tree1x,tree1y-imght/2+10,imght*5/15+5,imght+15);
-    if(tree1count>=150)
+    if(tree1count>=300)
     {
       world.remove(tree1);
     }
+    else
+      image(tree,tree1x,tree1y-imght/2+10,imght*5/15+5,imght+15);
     if(tree1count>=treeWait)
     {
       tree1count=0;
@@ -406,18 +419,19 @@ void draw() {
       tree2.setPosition(0,-(tree2count*tree2height/20));
       imght=tree2height*(float)tree2count/20;
     }
-    else if(tree2count>130)
+    else if(tree2count>280)
     {
-      tree2.setPosition(0,-((150-tree2count)*tree2height/20));
-      imght=tree2height*(float)(150-tree2count)/20;
+      tree2.setPosition(0,-((300-tree2count)*tree2height/20));
+      imght=tree2height*(float)(300-tree2count)/20;
     }
     else
       imght=tree2height;
-    image(tree,tree2x,tree2y-imght/2+10,imght*5/15+5,imght+15);
-    if(tree2count>=150)
+    if(tree2count>=300)
     {
       world.remove(tree2);
     }
+    else
+      image(tree,tree2x,tree2y-imght/2+10,imght*5/15+5,imght+15);
     if(tree2count>=treeWait)
     {
       tree2count=0;
@@ -439,18 +453,19 @@ void draw() {
       tree3.setPosition(0,-(tree3count*tree3height/20));
       imght=tree3height*(float)tree3count/20;
     }
-    else if(tree3count>130)
+    else if(tree3count>280)
     {
-      tree3.setPosition(0,-((150-tree3count)*tree3height/20));
-      imght=tree3height*(float)(150-tree3count)/20;
+      tree3.setPosition(0,-((300-tree3count)*tree3height/20));
+      imght=tree3height*(float)(300-tree3count)/20;
     }
     else
       imght=tree3height;
-    image(tree,tree3x,tree3y-imght/2+10,imght*5/15+5,imght+15);
-    if(tree3count>=150)
+    if(tree3count>=300)
     {
       world.remove(tree3);
     }
+    else
+      image(tree,tree3x,tree3y-imght/2+10,imght*5/15+5,imght+15);
     if(tree3count>=treeWait)
     {
       tree3count=0;
@@ -518,7 +533,9 @@ void draw() {
     
     fill(0,0,0);
     textFont(aharoni20,20);
-    text("SCORE: "+score,745,70);
+    if(dispScore<score)
+      dispScore++;
+    text("SCORE: "+dispScore,745,70);
     text("EXPERIENCE: "+experience,745,105);
     int h=max(health,0);
     image(healthbar[h/5],(3*width)/5,(height*2)/11,102,8);
@@ -531,7 +548,12 @@ void draw() {
   if(score>nextExperiencePoint)
   {
     experience++;
-    nextExperiencePoint+=150;
+    if(level<3)
+      nextExperiencePoint+=90;
+    else if(level<5)
+      nextExperiencePoint+=120;
+    else
+      nextExperiencePoint+=150;
   }
   rockCount++;
   
@@ -718,7 +740,7 @@ void draw() {
     }
     if(!pause)
       sbCount++;
-    if(sbCount<=150)
+    if(sbCount<=250)
     {
       pushMatrix();
       translate(sb.getX(),sb.getY());
@@ -730,7 +752,7 @@ void draw() {
       popMatrix();
       s=2;
     }
-    if(sbCount>=150)
+    if(sbCount>=250)
       world.remove(sb);
     if(sbCount>spiritWait)
     {
@@ -829,7 +851,7 @@ void draw() {
       bhSound.cue(0);
       bhSound.play();
     }
-    if(BHCount<=150)
+    if(BHCount<=300)
     {
       pushMatrix();
       translate(BH.getX(),BH.getY());
@@ -840,8 +862,11 @@ void draw() {
     }
     if(!pause)
       BHCount++;
-    if(BHCount>150)
+    if(BHCount>300)
+    {
+      bhSound.stop();
       world.remove(BH);
+    }
     if(BHCount>bholeWait)
     {
       createBH=false;
@@ -990,7 +1015,10 @@ void draw() {
     waitR3=(int)random(r3wait,r3wait+400);
     countR3=0;
     FCircle r3=new FCircle(30);
-    r3.setPosition(-20,250);
+    int r3h=250;
+    if(r3rand)
+      r3h=(int)random(0,400);
+    r3.setPosition(-20,r3h);
     r3.setVelocity(r3speed,0);
     r3.setFill(0,0,0,0);
     r3.setNoStroke();
@@ -1011,7 +1039,12 @@ void draw() {
        float r3x=r3.getX();
        float r3y=r3.getY();
        float r3angle=r3.getRotation();
-       r3.setVelocity(r3speed,0);
+       float yspeed=((250-r3y)*(250-r3y))/15;
+       if(r3y>250)
+         yspeed=-yspeed;
+       if(abs(250-r3y)<10)
+         yspeed=250-r3y;
+       r3.setVelocity(r3speed,yspeed);
        pushMatrix();
        translate(r3x,r3y);
        rotate(r3angle);
@@ -1385,14 +1418,14 @@ void mouseReleased() {
         experience-=nrockLevel;
         if(rockLevel==2)
         {
-          rockWait=30;
+          rockWait=75;
           psize=150;
           nrockLevel=2;
         }
         if(rockLevel==3)
         {
           psize=200;
-          rockWait=10;
+          rockWait=30;
           nrockLevel=0;
         }
     }
@@ -1404,9 +1437,13 @@ void mouseReleased() {
         {
           ntreeLevel=0;
           maxtrees=3;
+          treeWait=700;
         }
         else
+        {
           maxtrees=1;
+          ntreeLevel=2;
+        }
     }
     if((apressed)&&(experience>=nastLevel)&&(nastLevel!=0))
     {
@@ -1415,7 +1452,7 @@ void mouseReleased() {
         if(nastLevel==2)
         {
           maxWaves=3;
-          astWait=450;
+          astWait=650;
           nastLevel=0;
         }
         else
@@ -1719,267 +1756,171 @@ void contactStarted(FContact c) {
            return;
   }
 }
+
 void contactEnded(FContact c) {
-  boolean f1=true;
-  for(int i=0;i<gbits;i++)
+  FBody b1=c.getBody1();
+  FBody b2=c.getBody2();
+  float b1Density=b1.getDensity();
+  float b2Density=b2.getDensity();
+  FBody hittree=null;
+  if(b1Density==1.5)
+    hittree=b2;
+  else if(b2Density==1.5)
+    hittree=b1;
+  if(hittree!=null)
   {
-  if (c.getBody1() == grounds.get(i)) 
-  {
-    f1=false;
-    if((i==(gbits-2))||(i==(gbits-1)))
+    if((hittree.getDensity()==10)||(hittree.getDensity()==12));
+    else
     {
-        FBody hittree=c.getBody2();
-        if((hittree.getDensity()==10)||(hittree.getDensity()==12));
-        else
-        {
-        explosionX[expNo]=(int)hittree.getX();
-        explosionY[expNo]=(int)hittree.getY();
-        if(hittree.getDensity()==9)
-          health-=5;
-        else if(hittree.getDensity()==5)
-          health-=7;
-        else if(hittree.getDensity()==2)
-          health-=10;
-        expdisp[expNo]=1;
-        expNo++;
-        exp.cue(0);
-        exp.play();
-        }
-        world.remove(hittree);
+    explosionX[expNo]=(int)hittree.getX();
+    explosionY[expNo]=(int)hittree.getY();
+    if(hittree.getDensity()==9)
+      health-=5;
+    else if(hittree.getDensity()==5)
+      health-=7;
+    else if(hittree.getDensity()==2)
+      health-=10;
+    expdisp[expNo]=1;
+    expNo++;
+    exp.cue(0);
+    exp.play();
     }
-    FBody r2P=c.getBody2();
-    if(r2P.getDensity()==5)
-    {
-      r2sound.cue(0);
-      r2sound.play();
-    }
+    world.remove(hittree);
     return;
   }
-  if (c.getBody2() == grounds.get(i))
-  {
-    f1=false;
-    if((i==(gbits-2))||(i==(gbits-1)))
-    {
-        FBody hittree=c.getBody1();
-        if((hittree.getDensity()==10)||(hittree.getDensity()==12));
-        else
-        {
-        explosionX[expNo]=(int)hittree.getX();
-        explosionY[expNo]=(int)hittree.getY();
-        if(hittree.getDensity()==9)
-          health-=5;
-        else if(hittree.getDensity()==5)
-          health-=10;
-        else if(hittree.getDensity()==2)
-          health-=15;
-        expdisp[expNo]=1;
-        expNo++;
-        exp.cue(0);
-        exp.play();
-        }
-        world.remove(hittree); 
-    }
-    FBody r2P=c.getBody1();
-    if(r2P.getDensity()==5)
-    {
-      r2sound.cue(0);
-      r2sound.play();
-    }
-    return;
-  }
-  }
-  if(f1)
-  {
-      FBody ob1=c.getBody1();
-      FBody ob2=c.getBody2();
-      if((ob1.getDensity()==9)||(ob1.getDensity()==5)||(ob1.getDensity()==2))
-       {
-         float fx,fy;
-         FBody othobj=c.getBody2();
-         if(othobj.getDensity()==10)
-         {
-         fx=othobj.getVelocityX();
-         fy=othobj.getVelocityY();
-         float net=(fx*fx)+(fy*fy);
-         if(net>30000)
-         {
-           explosionX[expNo]=(int)ob1.getX();
-           explosionY[expNo]=(int)ob1.getY();
-           expdisp[expNo]=1;
-           expNo++;
-           exp.cue(0);
-           exp.play();
-           for(int i=0;i<rob1;i++)
-           {
-             if((robot1.get(i)==ob1)&&(destR1[i]==false))
-             {
-               score+=30;
-               lastkillX=(int)ob1.getX();
-               lastkillY=(int)ob1.getY();
-               killcount++; if(killcount==1) killtimer=0;
-               if(killtimer>100)
-               {
-                 killtimer=0;
-                 killcount=1;
-               }
-               destR1[i]=true;
-               if(i%3==0)
-                 r1sound1.stop();
-               else if(i%3==1)
-                 r1sound2.stop();
-               else
-                 r1sound3.stop();
-             }
-             if(i<rob2)
-             {
-               if((robot2.get(i)==ob1)&&(destR2[i]==false))
-               {
-                 score+=50;
-                 lastkillX=(int)ob1.getX();
-                 lastkillY=(int)ob1.getY();
-                 killcount++; if(killcount==1) killtimer=0;
-                 if(killtimer>100)
-                 {
-                   killtimer=0;
-                   killcount=1;
-                 }
-                 destR2[i]=true;
-               }
-             }
-             if(i<rob3)
-             {
-               if((robot3.get(i)==ob1)&&(destR3[i]==false))
-               {
-                 score+=100;
-                 lastkillX=(int)ob1.getX();
-                 lastkillY=(int)ob1.getY();
-                 killcount++; if(killcount==1) killtimer=0;
-                 if(killtimer>100)
-                 {
-                   killtimer=0;
-                   killcount=1;
-                 }
-                 destR3[i]=true;
-               }
-             }
-           }
-           world.remove(ob1);
-           ob1=null;
-           return;
-         }
-         else
-         {
-           laser.cue(0);
-           laser.play();
-           world.remove(othobj);
-         }
-         }
-         return;
-       }
-      else if((ob2.getDensity()==9)||(ob2.getDensity()==5)||(ob2.getDensity()==2))
-       {
-         float fx,fy;
-         FBody othobj=c.getBody1();
-         if(othobj.getDensity()==10)
-         {
-         fx=othobj.getVelocityX();
-         fy=othobj.getVelocityY();
-         float net=(fx*fx)+(fy*fy);
-         if(net>30000)
-         {
-           explosionX[expNo]=(int)ob2.getX();
-           explosionY[expNo]=(int)ob2.getY();
-           expdisp[expNo]=1;
-           expNo++;
-           exp.cue(0);
-           exp.play();
-           for(int i=0;i<rob1;i++)
-           {
-             if((robot1.get(i)==ob2)&&(destR1[i]==false))
-             {
-               score+=30;
-               lastkillX=(int)ob2.getX();
-               lastkillY=(int)ob2.getY();
-               killcount++; if(killcount==1) killtimer=0;
-               if(killtimer>100)
-               {
-                 killtimer=0;
-                 killcount=1;
-               }
-               destR1[i]=true;
-               if(i%3==0)
-                 r1sound1.stop();
-               else if(i%3==1)
-                 r1sound2.stop();
-               else
-                 r1sound3.stop();
-             }
-             if(i<rob2)
-             {
-               if((robot2.get(i)==ob2)&&(destR2[i]==false))
-               {
-                 score+=50;
-                 lastkillX=(int)ob2.getX();
-                 lastkillY=(int)ob2.getY();
-                 killcount++; if(killcount==1) killtimer=0;
-                 if(killtimer>100)
-                 {
-                   killtimer=0;
-                   killcount=1;
-                 }
-                 destR2[i]=true;
-               }
-             }
-             if(i<rob3)
-             {
-               if((robot3.get(i)==ob2)&&(destR3[i]==false))
-               {
-                 score+=100;
-                 lastkillX=(int)ob2.getX();
-                 lastkillY=(int)ob2.getY();
-                 killcount++; if(killcount==1) killtimer=0;
-                 if(killtimer>100)
-                 {
-                   killtimer=0;
-                   killcount=1;
-                 }
-                 destR3[i]=true;
-               }
-             }
-           }
-           world.remove(ob2);
-           ob2=null; 
-           return;
-         }
-         else
-         { 
-           laser.cue(0);
-           laser.play();
-           world.remove(othobj);
-         }
-         }
-         return;
-       }
+  FBody hitground=null;
+  if(b1Density==0.1)
+    hitground=b2;
+  else if(b2Density==0.1)
+    hitground=b1;
     
+  if(hitground!=null)
+  {
+    if(hitground.getDensity()==5)
+    {
+      r2sound.cue(0);
+      r2sound.play();
+      float r2vx=hitground.getVelocityX();
+      float r2vy=hitground.getVelocityY();
+      hitground.setVelocity(r2vx+(2*r2boost),r2vy-r2boost);
+    }
+    return;
   }
   
+  FBody robot=null;
+  FBody othobj=null;
+  if((b1Density==9)||(b1Density==5)||(b1Density==2))
+  {
+    robot=b1;
+    othobj=b2;
+  }
+  if((b2Density==9)||(b2Density==5)||(b2Density==2))
+  {
+    robot=b2;
+    othobj=b1;
+  }
+  if(robot!=null)
+  {
+   float fx,fy;
+   if(othobj.getDensity()==10)
+   {
+   fx=othobj.getVelocityX();
+   fy=othobj.getVelocityY();
+   float net=(fx*fx)+(fy*fy);
+   if(net>(30000-(rockLevel*3000)))
+   {
+     explosionX[expNo]=(int)robot.getX();
+     explosionY[expNo]=(int)robot.getY();
+     expdisp[expNo]=1;
+     expNo++;
+     exp.cue(0);
+     exp.play();
+     for(int i=0;i<rob1;i++)
+     {
+       if((robot1.get(i)==robot)&&(destR1[i]==false))
+       {
+         score+=30;
+         lastkillX=(int)robot.getX();
+         lastkillY=(int)robot.getY();
+         killcount++; if(killcount==1) killtimer=0;
+         if(killtimer>100)
+         {
+           killtimer=0;
+           killcount=1;
+         }
+         destR1[i]=true;
+         if(i%3==0)
+           r1sound1.stop();
+         else if(i%3==1)
+           r1sound2.stop();
+         else
+           r1sound3.stop();
+       }
+       if(i<rob2)
+       {
+         if((robot2.get(i)==robot)&&(destR2[i]==false))
+         {
+           score+=50;
+           lastkillX=(int)robot.getX();
+           lastkillY=(int)robot.getY();
+           killcount++; if(killcount==1) killtimer=0;
+           if(killtimer>100)
+           {
+             killtimer=0;
+             killcount=1;
+           }
+           destR2[i]=true;
+         }
+       }
+       if(i<rob3)
+       {
+         if((robot3.get(i)==robot)&&(destR3[i]==false))
+         {
+           score+=100;
+           lastkillX=(int)robot.getX();
+           lastkillY=(int)robot.getY();
+           killcount++; if(killcount==1) killtimer=0;
+           if(killtimer>100)
+           {
+             killtimer=0;
+             killcount=1;
+           }
+           destR3[i]=true;
+         }
+       }
+     }
+     world.remove(robot);
+     robot=null;
+   }
+   else
+   { 
+     laser.cue(0);
+     laser.play();
+     world.remove(othobj);
+   }
+   }
+  }
 }
 
 void restart()
 {
       health=100;
       instPage=1;
-      experience=30;
-      level=levelCount=0;
+      r3rand=false;
+      experience=0;
+      level=0;
+      levelCount=0;
       levelwait=100;
-      rockWait=75;treeWait=200;astWait=250;
+      rockWait=125;treeWait=450;astWait=400;
       psize=100;
       maxtrees=0;
+      dispScore=0;
       killcount=0;
       score=0;
       crob1=false;crob2=false;crob3=false;
       waitR1=200;waitR2=3400;waitR3=10000;
-      r1wait=300;r2wait=500;r3wait=600;
+      r1wait=350;r2wait=550;r3wait=650;
+      r1speed=5;r2speed=7;r2boost=0;r3speed=0;
       countR1=countR2=countR3=0;
       pause=false;
       rockLevel=1;treeLevel=0;astLevel=0;spiritLevel=0;bholeLevel=0;
