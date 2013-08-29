@@ -56,6 +56,8 @@ int cometX, cometY, waves=0, maxWaves=0, BHX, BHY;
 int rockLevel=1,treeLevel=0,astLevel=0,spiritLevel=0,bholeLevel=0;
 int nrockLevel=1,ntreeLevel=3,nastLevel=4,nspiritLevel=8,nbholeLevel=10;
 int nextExperiencePoint=100;
+int lastkillX,lastkillY,comboX,comboY,comboCount=-1,comboKill;
+int killcount=0,killtimer=0;
 FCircle sb;
 FCircle com1,com2,com3,com4,com5;
 FCircle BH;
@@ -67,7 +69,6 @@ boolean playHov=false,instrHov=false,creditsHov=false,playP=false,instrP=false,c
 boolean GoBackMenuHov=false,GoBackMenuP=false,instrNextHov=false,instrNextP=false,instrBackHov=false,instrBackP=false;
 int instPage=1;
 boolean pauseResumeHov=false,pauseResumeP=false,pauseNGHov=false,pauseNGP=false,pauseInstrHov=false,pauseInstrP=false,pauseInstrDo=false,pauseGBHov=false,pauseGBP=false;
-
 int recent;
 boolean lev2tree=false;
 
@@ -276,11 +277,40 @@ void setup() {
 void draw() {
   if(!intro)
   {
+  if(!pause)
+    killtimer++;
+  if(killtimer>100)
+  {
+    killcount=0;
+    killtimer=0;
+  }
+  
+  if((killtimer==100)&&(killcount>1))
+  {
+    comboCount=0;
+    comboX=lastkillX;
+    comboY=lastkillY;
+    comboKill=killcount;
+  }
+  
   if((BHCount>1)&&(BHCount<150))
     tint(200,200,255);
   image(sky,width/2,height/2,width,height);
   tint(255,255,255);
   
+  int combolength=240;//how long you want it to stay
+  if(comboCount>=0)
+  {
+    tint(255,comboCount);
+    image(comboText,comboX+10,comboY-10,200,20);
+    if(comboKill>9)
+      comboKill=9; //Can't be greater than 9 right now, you can fix this by taking mod 10 and dividing by 10 and displaying 2 numbers. 10 might be possible with a blackhole
+    image(Numbers[comboKill],comboX+65,comboY-10,30,20);
+    tint(255);
+    comboCount++;
+    if(comboCount>combolength)
+      comboCount=-1;
+  }
   levelCount++;
   if(levelCount>levelwait)
   {
@@ -1519,6 +1549,8 @@ void contactStarted(FContact c) {
     }
     explosionX[expNo]=(int)b2.getX();
     explosionY[expNo]=(int)b2.getY();
+    lastkillX=(int)b2.getX();
+    lastkillY=(int)b2.getY();
     expdisp[expNo]=1;
     expNo++;
     exp.cue(0);
@@ -1529,6 +1561,13 @@ void contactStarted(FContact c) {
              if((robot1.get(i)==b2)&&(destR1[i]==false))
              {
                score+=30;
+               killcount++; 
+               if(killcount==1) killtimer=0;
+               if(killtimer>100)
+               {
+                 killtimer=0;
+                 killcount=1;
+               }
                destR1[i]=true;
                if(i%3==0)
                  r1sound1.stop();
@@ -1542,6 +1581,12 @@ void contactStarted(FContact c) {
                if((robot2.get(i)==b2)&&(destR2[i]==false))
                {
                  score+=50;
+                 killcount++; if(killcount==1) killtimer=0;
+                 if(killtimer>100)
+                 {
+                   killtimer=0;
+                   killcount=1;
+                 }
                  destR2[i]=true;
                }
              }
@@ -1550,6 +1595,12 @@ void contactStarted(FContact c) {
                if((robot3.get(i)==b2)&&(destR3[i]==false))
                {
                  score+=100;
+                 killcount++; if(killcount==1) killtimer=0;
+                 if(killtimer>100)
+                 {
+                   killtimer=0;
+                   killcount=1;
+                 }
                  destR3[i]=true;
                }
              }
@@ -1566,6 +1617,14 @@ void contactStarted(FContact c) {
       score+=50;
     if(b1.getDensity()==2)
       score+=100;
+    lastkillX=(int)b1.getX();
+    lastkillY=(int)b1.getY();
+    killcount++; if(killcount==1) killtimer=0;
+    if(killtimer>100)
+    {
+      killtimer=0;
+      killcount=1;
+    }
     world.remove(b1);
   }
   if(b1.getDensity()==13)
@@ -1576,6 +1635,14 @@ void contactStarted(FContact c) {
       score+=50;
     if(b2.getDensity()==2)
       score+=100;
+    lastkillX=(int)b2.getX();
+    lastkillY=(int)b2.getY();
+    killcount++; if(killcount==1) killtimer=0;
+    if(killtimer>100)
+    {
+     killtimer=0;
+     killcount=1;
+    }
     world.remove(b2);
   }
   b1=c.getBody2();
@@ -1598,6 +1665,14 @@ void contactStarted(FContact c) {
              if((robot1.get(i)==b2)&&(destR1[i]==false))
              {
                score+=30;
+               lastkillX=(int)b2.getX();
+               lastkillY=(int)b2.getY();
+               killcount++; if(killcount==1) killtimer=0;
+               if(killtimer>100)
+               {
+                 killtimer=0;
+                 killcount=1;
+               }
                destR1[i]=true;
                if(i%3==0)
                  r1sound1.stop();
@@ -1611,6 +1686,14 @@ void contactStarted(FContact c) {
                if((robot2.get(i)==b2)&&(destR2[i]==false))
                {
                  score+=50;
+                 lastkillX=(int)b2.getX();
+                 lastkillY=(int)b2.getY();
+                 killcount++; if(killcount==1) killtimer=0;
+                 if(killtimer>100)
+                 {
+                   killtimer=0;
+                   killcount=1;
+                 }
                  destR2[i]=true;
                }
              }
@@ -1619,6 +1702,14 @@ void contactStarted(FContact c) {
                if((robot3.get(i)==b2)&&(destR3[i]==false))
                {
                  score+=100;
+                 lastkillX=(int)b2.getX();
+                 lastkillY=(int)b2.getY();
+                 killcount++; if(killcount==1) killtimer=0;
+                 if(killtimer>100)
+                 {
+                   killtimer=0;
+                   killcount=1;
+                 }
                  destR3[i]=true;
                }
              }
@@ -1723,6 +1814,14 @@ void contactEnded(FContact c) {
              if((robot1.get(i)==ob1)&&(destR1[i]==false))
              {
                score+=30;
+               lastkillX=(int)ob1.getX();
+               lastkillY=(int)ob1.getY();
+               killcount++; if(killcount==1) killtimer=0;
+               if(killtimer>100)
+               {
+                 killtimer=0;
+                 killcount=1;
+               }
                destR1[i]=true;
                if(i%3==0)
                  r1sound1.stop();
@@ -1736,6 +1835,14 @@ void contactEnded(FContact c) {
                if((robot2.get(i)==ob1)&&(destR2[i]==false))
                {
                  score+=50;
+                 lastkillX=(int)ob1.getX();
+                 lastkillY=(int)ob1.getY();
+                 killcount++; if(killcount==1) killtimer=0;
+                 if(killtimer>100)
+                 {
+                   killtimer=0;
+                   killcount=1;
+                 }
                  destR2[i]=true;
                }
              }
@@ -1744,6 +1851,14 @@ void contactEnded(FContact c) {
                if((robot3.get(i)==ob1)&&(destR3[i]==false))
                {
                  score+=100;
+                 lastkillX=(int)ob1.getX();
+                 lastkillY=(int)ob1.getY();
+                 killcount++; if(killcount==1) killtimer=0;
+                 if(killtimer>100)
+                 {
+                   killtimer=0;
+                   killcount=1;
+                 }
                  destR3[i]=true;
                }
              }
@@ -1783,6 +1898,14 @@ void contactEnded(FContact c) {
              if((robot1.get(i)==ob2)&&(destR1[i]==false))
              {
                score+=30;
+               lastkillX=(int)ob2.getX();
+               lastkillY=(int)ob2.getY();
+               killcount++; if(killcount==1) killtimer=0;
+               if(killtimer>100)
+               {
+                 killtimer=0;
+                 killcount=1;
+               }
                destR1[i]=true;
                if(i%3==0)
                  r1sound1.stop();
@@ -1796,6 +1919,14 @@ void contactEnded(FContact c) {
                if((robot2.get(i)==ob2)&&(destR2[i]==false))
                {
                  score+=50;
+                 lastkillX=(int)ob2.getX();
+                 lastkillY=(int)ob2.getY();
+                 killcount++; if(killcount==1) killtimer=0;
+                 if(killtimer>100)
+                 {
+                   killtimer=0;
+                   killcount=1;
+                 }
                  destR2[i]=true;
                }
              }
@@ -1804,6 +1935,14 @@ void contactEnded(FContact c) {
                if((robot3.get(i)==ob2)&&(destR3[i]==false))
                {
                  score+=100;
+                 lastkillX=(int)ob2.getX();
+                 lastkillY=(int)ob2.getY();
+                 killcount++; if(killcount==1) killtimer=0;
+                 if(killtimer>100)
+                 {
+                   killtimer=0;
+                   killcount=1;
+                 }
                  destR3[i]=true;
                }
              }
@@ -1836,6 +1975,7 @@ void restart()
       rockWait=75;treeWait=200;astWait=250;
       psize=100;
       maxtrees=0;
+      killcount=0;
       score=0;
       crob1=false;crob2=false;crob3=false;
       waitR1=200;waitR2=3400;waitR3=10000;
