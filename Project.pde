@@ -300,21 +300,7 @@ void draw() {
   image(sky,width/2,height/2,width,height);
   tint(255,255,255);
   
-  int combolength=240;//how long you want it to stay
-  if(comboCount>=0)
-  {
-    if(comboCount==0)
-      score+=comboKill*10*comboKill;
-    tint(255,comboCount);
-    image(comboText,comboX+10,comboY-10,200,20);
-    if(comboKill>9)
-      comboKill=9; //Can't be greater than 9 right now, you can fix this by taking mod 10 and dividing by 10 and displaying 2 numbers. 10 might be possible with a blackhole
-    image(Numbers[comboKill],comboX+65,comboY-10,30,20);
-    tint(255);
-    comboCount++;
-    if(comboCount>combolength)
-      comboCount=-1;
-  }
+  
   
   if(!pause)
     levelCount++;
@@ -478,6 +464,21 @@ void draw() {
   s=0;
   image(tower,width/2+100,height/2-53,width/5,height/2.5);
   image(background,width/2,height/2,width,height);
+  int combolength=240;//how long you want it to stay
+  if(comboCount>=0)
+  {
+    if(comboCount==0)
+      score+=comboKill*10*comboKill;
+    tint(255,comboCount);
+    image(comboText,comboX+10,comboY-10,200,20);
+    if(comboKill>9)
+      comboKill=9; //Can't be greater than 9 right now, you can fix this by taking mod 10 and dividing by 10 and displaying 2 numbers. 10 might be possible with a blackhole
+    image(Numbers[comboKill],comboX+65,comboY-10,30,20);
+    tint(255);
+    comboCount++;
+    if(comboCount>combolength)
+      comboCount=-1;
+  }
   }
   if(!intro)
   {
